@@ -22,6 +22,7 @@ function save_options(){
 	localStorage['pdurl'] = getId('pdurl').value;
 	localStorage['timercheck'] = getId('timercheck').checked;
 	localStorage.default_pattern = getId('defaultPattern').value;
+	localStorage.default_pattern1 = getId('defaultPattern1').value;
 
 
 	if(getId('timer01').checked) {
@@ -98,8 +99,10 @@ function read_options(){
 	}
 
 	if(localStorage.default_pattern){
-		// set deafult pattern 
 		getId('defaultPattern').value = localStorage.default_pattern;
+	}
+	if(localStorage.default_pattern1){
+		getId('defaultPattern1').value = localStorage.default_pattern1;
 	}
 
  	// sound

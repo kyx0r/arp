@@ -4,6 +4,8 @@ ready(() => {
 	getId('startbtn').onclick = startRefresh
 	getId('default-value-button').onclick = () =>
 		getId('contentid').value = localStorage.default_pattern
+	getId('default-value-button1').onclick = () =>
+		getId('contentid1').value = localStorage.default_pattern1
 	getId('r08').onclick = () => getId('tcustom').focus()
 	getId('tcustom').onfocus = () => getId('r08').checked = true
 	getId('r07').onclick = () => getId('tmin').focus()
@@ -101,8 +103,8 @@ function set_interval(time_interval, time_type) {
 function startRefresh() {
   if ( getId("startbtn").value == "Start" ) {
 
-  	getId("startbtn").classList.add("stop");
-    getId("startbtn").value = "Stop";
+	getId("startbtn").classList.add("stop");
+	getId("startbtn").value = "Stop";
 
 	getId("timerbtn").value = "Start Timer";
 	getId("timerbtn").classList.remove("stop");
@@ -110,17 +112,18 @@ function startRefresh() {
 	var myInterval = get_interval();
 	var views = chrome.extension.getViews();
 	var checkme = getId("contentid").value;
+	var checkme1 = getId("contentid1").value;
 	var preurl = getId("pdurlinp").value;
 
     for (var i in views) {
 			if(checkme) {
 				var page_monitor_pattern = getId("pmpattern").value;
 				if (views[i].loop_start) {
-					views[i].loop_start(-1, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl);
+					views[i].loop_start(-1, myInterval[0], myInterval[1], checkme, checkme1, page_monitor_pattern, preurl);
 				}
 			} else {
 				if (views[i].loop_start) {
-					views[i].loop_start(-1, myInterval[0], myInterval[1], null, null, preurl);
+					views[i].loop_start(-1, myInterval[0], myInterval[1], null, null, null, preurl);
 				}
 			}
 		}
@@ -140,6 +143,7 @@ function startTimer() {
   if (getId("timerbtn").value == "Start Timer" ) {
 	var myInterval = get_interval();
 	var checkme = getId("contentid").value;
+	var checkme1 = getId("contentid1").value;
 	var preurl = getId("pdurlinp").value;
 
   	var timer_mode = getId("timermode").value;
@@ -162,11 +166,11 @@ function startTimer() {
 				if(checkme) {
 					var page_monitor_pattern = getId("pmpattern").value;
 					if (views[i].loop_start) {
-						views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl);
+						views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, checkme1, page_monitor_pattern, preurl);
 					}
 				} else {
 					if (views[i].loop_start) {
-						views[i].loop_start(waitTime, myInterval[0], myInterval[1], null, null, preurl);
+						views[i].loop_start(waitTime, myInterval[0], myInterval[1], null, null, null, preurl);
 					}
 				}
 			}
@@ -202,11 +206,11 @@ function startTimer() {
 				if(checkme) {
 					var page_monitor_pattern = getId("pmpattern").value;
 					if (views[i].loop_start) {
-						views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl);
+						views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, checkme1, page_monitor_pattern, preurl);
 					}
 				} else {
 					if (views[i].loop_start) {
-						views[i].loop_start(waitTime, myInterval[0], myInterval[1], null, null, preurl);
+						views[i].loop_start(waitTime, myInterval[0], myInterval[1], null, null, null, preurl);
 					}
 				}
 			}
@@ -241,6 +245,9 @@ function restoreOptions() {
 		if(!localStorage.default_pattern){ // only show button if default text is set
 			getId('default-value-button').classList.toggle('hideButton')
 		}
+		if(!localStorage.default_pattern){ // only show button if default text is set
+			getId('default-value-button1').classList.toggle('hideButton')
+		}
 		if(localStorage['pmpattern'] && localStorage['pmpattern'] == 'B') {
 			show(getId('pagemr02'))
 			hide(getId('pagemr01'))
@@ -250,6 +257,7 @@ function restoreOptions() {
 			show(getId('pagemr01'))
 			getId('pmpattern').value = 'A'
 		}
+		show(getId('pagemr03'))
 	}
 	if(localStorage['pdcheck'] && localStorage['pdcheck'] == 'true'){
 		show(getId('pdurlbox'))
@@ -308,7 +316,10 @@ function recvData(data){
 
 	set_interval(data.time_interval, data.time_type);
 	if(data.checkme) {
-			getId('contentid').value = data.checkme;
+		getId('contentid').value = data.checkme;
+	}
+	if(data.checkme1) {
+		getId('contentid1').value = data.checkme1;
 	}
 
 	if(data.wait_time) {

@@ -17,7 +17,7 @@ if (localStorage['autostart'] == "true" && auto_start_url) {
 	if(localStorage['default_time']) {
 		default_time = localStorage['default_time'] * 1000;
 	}
-	loop_start(-1, default_time, 'C', '', '', auto_start_url);
+	loop_start(-1, default_time, 'C', '', '', '', auto_start_url);
 }
 chrome.extension.onConnect.addListener(function(port) {
 	if (port.name === 'getOptions') {
@@ -26,7 +26,7 @@ chrome.extension.onConnect.addListener(function(port) {
 				getCurrentTab( function(tab) {
 					var tabIsReloaderActive = tabs[tab.id] || false;
 					if (tabIsReloaderActive) {
-						port.postMessage({status:tabs[tab.id].status, time_interval:tabs[tab.id].interval_time, time_type:tabs[tab.id].time_type, checkme:tabs[tab.id].checkme, wait_time:tabs[tab.id].wait_time});
+						port.postMessage({status:tabs[tab.id].status, time_interval:tabs[tab.id].interval_time, time_type:tabs[tab.id].time_type, checkme:tabs[tab.id].checkme, checkme1:tabs[tab.id].checkme1, wait_time:tabs[tab.id].wait_time});
 					}
 				});
 			}
@@ -34,51 +34,13 @@ chrome.extension.onConnect.addListener(function(port) {
 	}
 });
 
-
-var RELOAD_LIMIT = 10;
-var counters = {}; // TODO: tabs[id].count
-var pending_reloads = {};
-var blank_page = chrome.extension.getURL('blank.html');//'about:blank'; //
-
 function updateTab(tabId, theurl){
   try {
-  	counters[tabId] = counters[tabId] || 0;
-  	counters[tabId] += 1;
-
-  	/// NOTE: Blank page isn't used for now
-  	//if (counters[tabId] < RELOAD_LIMIT) {
-  	if (true) {
-  		//pro: scroll position, contra: predefined URL
-  		//var details = {code: "window.location.reload(true)"};
-  		//chrome.tabs.executeScript(tabId, details);
     	chrome.tabs.update(tabId, {url: theurl});
-  	}
-    else {
-    	// make sure we're cycling in a blank page to release leaked memory
-    	counters[tabId] = 0;
-    	pending_reloads[tabId] = theurl;
-    	updateTabWithBlankSandwich(tabId, theurl);
-    	//chrome.tabs.update(tabId, {url: blank_page});
-    }
   } catch (e) {
     alert(e);
   }
 }
-
-function updateTabWithBlankSandwich(tabId, url) {
-	chrome.tabs.update(tabId, {url: blank_page});
-}
-
-chrome.tabs.onUpdated.addListener(function (tabId, info, tab) {
-	  if (	info.url == blank_page &&
-	  			pending_reloads[tabId] &&
-	  			info.status == 'loading') 
-	  {
-		delete pending_reloads[tabId];
-	  }
-});
-
-
 
 function real_start(tabId, actionUrl) {
 	stopBadgeTimer(tabId);
@@ -92,7 +54,7 @@ function get_rand_time(tmin, tmax) {
 	return rand_time;
 }
 
-function loop_start(waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url) {
+function loop_start(waitTime, interval_time, interval_type, checkme, checkme1, page_monitor_pattern, predefined_url) {
 
 	getCurrentTab( function(tab) {
 		var currentTabId = tab.id;
@@ -122,6 +84,9 @@ function loop_start(waitTime, interval_time, interval_type, checkme, page_monito
 		tabs[currentTabId]['next_round'] = tabs[currentTabId]['time_between_load']/1000;
 		if(checkme) {
 			tabs[currentTabId]['checkme'] = checkme;
+		}
+		if(checkme1) {
+			tabs[currentTabId]['checkme1'] = checkme1;
 		}
 		if(page_monitor_pattern) {
 			tabs[currentTabId]['pmpattern'] = page_monitor_pattern;
@@ -171,8 +136,6 @@ function loop_stop() {
 }
 
 function onUpdateListener(tabId, changeInfo, tab) {
-
-	if (tab.url == blank_page) return;
 
 	chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
@@ -393,12 +356,13 @@ function reload_it(tabId, tab_url) {
 
 	if(tabs[tabId]['checkme']) {
 		var check_content = tabs[tabId]['checkme'];
+		var check_content1 = tabs[tabId]['checkme1'];
 		var pmpattern = tabs[tabId]['pmpattern'];
 
 		if(tabs[tabId]['count'] == 0) {
 			updateTab(tabId, tab_url);
 		} else {
-			chrome.tabs.sendMessage(tabId, {checkme: check_content, pattern: pmpattern}, function(response) {
+			chrome.tabs.sendMessage(tabId, {checkme: check_content, checkme1: check_content1, pattern: pmpattern}, function(response) {
 			if (response.findresult == "yes") {
 				reload_cancel(tabId, 'yes');
 				// notification & tab handling

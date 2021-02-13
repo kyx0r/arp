@@ -24,22 +24,48 @@ function writeCookie(name, value, hours) {
 function rememberPos() {
 	writeCookie('arp_scroll_position', window.pageYOffset, 6);
 }
+
+function sleep(delay) {
+    var start = new Date().getTime();
+        while (new Date().getTime() < start + delay);
+}
+
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
     var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
-		  sendResponse({findresult: "yes"});
+		if (request.checkme1)
+		{
+			var regex1 = new RegExp(request.checkme1, "i");
+			if (!regex1.test(document.body.innerHTML)) {
+				sendResponse({});
+			} else {
+				sendResponse({findresult: "yes"});
+			}
 		} else {
-		  //Snub them.
-		  sendResponse({});
+			sendResponse({findresult: "yes"});
+		}
+		} else {
+		//Snub them.
+		sendResponse({});
 		}
 	} else if(request.pattern == 'B') {
 		if (!regex.test(document.body.innerHTML)) {
-		  sendResponse({findresult: "yes"});
+		if (request.checkme1)
+		{
+			var regex1 = new RegExp(request.checkme1, "i");
+			if (regex1.test(document.body.innerHTML)) {
+				sendResponse({});
+			} else {
+				sendResponse({findresult: "yes"});
+			}
 		} else {
-		  //Snub them.
-		  sendResponse({});
+			sendResponse({findresult: "yes"});
+		}
+		} else {
+		//Snub them.
+		sendResponse({});
 		}
 	} else if(request.pattern == 'C') {
 		writeCookie('arp_scroll_switch', '1', 12);
