@@ -35,6 +35,20 @@ chrome.extension.onMessage.addListener(
     var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
+		var btn = document.querySelectorAll('.button.btn-cart');
+		var addtcrt = "Add to Cart"; 
+		var skip = 9;
+		for (var i = 0; i < btn.length; i++) {
+			if (btn[i] != null)
+			{
+				console.log(btn[i].innerText);
+				if (i >= skip && addtcrt.localeCompare(btn[i].innerText) == 0)
+				{
+					btn[i].click();
+					break;
+				}
+			}
+		}
 		if (request.checkme1)
 		{
 			var regex1 = new RegExp(request.checkme1, "i");
