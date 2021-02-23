@@ -19,6 +19,7 @@ if (localStorage['autostart'] == "true" && auto_start_url) {
 	}
 	loop_start(-1, default_time, 'C', '', '', '', auto_start_url);
 }
+
 chrome.extension.onConnect.addListener(function(port) {
 	if (port.name === 'getOptions') {
 		port.onMessage.addListener(function(data) {
@@ -136,7 +137,6 @@ function loop_stop() {
 }
 
 function onUpdateListener(tabId, changeInfo, tab) {
-
 	chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
 	if (tabIsReloaderActive) {
@@ -353,7 +353,6 @@ function pause_sound_with_fadeout(sound) {
 }
 
 function reload_it(tabId, tab_url) {
-
 	if(tabs[tabId]['checkme']) {
 		var check_content = tabs[tabId]['checkme'];
 		var check_content1 = tabs[tabId]['checkme1'];
@@ -363,6 +362,8 @@ function reload_it(tabId, tab_url) {
 			updateTab(tabId, tab_url);
 		} else {
 			chrome.tabs.sendMessage(tabId, {checkme: check_content, checkme1: check_content1, pattern: pmpattern}, function(response) {
+			if (chrome.runtime.lastError)
+				setTimeout(reload_it, 1000);
 			if (response.findresult == "yes") {
 				reload_cancel(tabId, 'yes');
 				// notification & tab handling

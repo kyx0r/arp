@@ -88,6 +88,7 @@ chrome.extension.onMessage.addListener(
 		writeCookie('arp_scroll_position', 0, -1);
 	}
 });
+
 var do_jump = readCookie('arp_scroll_switch');
 if(do_jump && do_jump == '1') {
 	var arp_jump = readCookie('arp_scroll_position');
