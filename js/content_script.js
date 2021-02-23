@@ -27,7 +27,7 @@ function rememberPos() {
 
 function sleep(delay) {
     var start = new Date().getTime();
-        while (new Date().getTime() < start + delay);
+	while (new Date().getTime() < start + delay);
 }
 
 chrome.extension.onMessage.addListener(
@@ -36,7 +36,7 @@ chrome.extension.onMessage.addListener(
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
 		var btn = document.querySelectorAll('.button.btn-cart');
-		var addtcrt = "Add to Cart"; 
+		var addtcrt = "Add to Cart";
 		var skip = 9;
 		for (var i = 0; i < btn.length; i++) {
 			if (btn[i] != null)

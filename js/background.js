@@ -79,6 +79,8 @@ function loop_start(waitTime, interval_time, interval_type, checkme, checkme1, p
 			var interval_time_tmp = get_rand_time(min_max_arr[0], min_max_arr[1]);
 			tabs[currentTabId]['time_between_load'] = interval_time_tmp * 1000;
 		} else {
+			if (interval_time == 0)
+				interval_time = 1;
 			tabs[currentTabId]['time_between_load'] = interval_time;
 		}
 		tabs[currentTabId]['time_type'] = interval_type;
@@ -352,19 +354,25 @@ function pause_sound_with_fadeout(sound) {
 	}, 16)
 }
 
+var stopat = -1;
+
 function reload_it(tabId, tab_url) {
 	if(tabs[tabId]['checkme']) {
 		var check_content = tabs[tabId]['checkme'];
 		var check_content1 = tabs[tabId]['checkme1'];
 		var pmpattern = tabs[tabId]['pmpattern'];
 
+		if (tabs[tabId]['count'] == stopat)
+			reload_cancel(tabId, 'yes');
 		if(tabs[tabId]['count'] == 0) {
 			updateTab(tabId, tab_url);
 		} else {
 			chrome.tabs.sendMessage(tabId, {checkme: check_content, checkme1: check_content1, pattern: pmpattern}, function(response) {
 			if (!chrome.runtime.lastError && response.findresult == "yes") {
-				reload_cancel(tabId, 'yes');
 				// notification & tab handling
+				tabs[tabId]['pre_url'] = "https://www.zotacstore.com/us/checkout/onepage/";
+				stopat = tabs[tabId]['count'];
+				tabs[tabId]['pmpattern'] = 'E';
 				chrome.tabs.get(tabId, function (tab) {
 					chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
 						// draw attention to target window if it's not focused inside Chrome
@@ -378,6 +386,7 @@ function reload_it(tabId, tab_url) {
 							// switch to target tab & its window upon clicking the box
 							chrome.tabs.update(tabId, {active: true});
 							chrome.windows.update(tab.windowId, {focused: true});
+							reload_cancel(tabId, 'yes');
 						});
 					});
 				});
