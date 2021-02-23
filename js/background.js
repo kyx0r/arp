@@ -362,9 +362,7 @@ function reload_it(tabId, tab_url) {
 			updateTab(tabId, tab_url);
 		} else {
 			chrome.tabs.sendMessage(tabId, {checkme: check_content, checkme1: check_content1, pattern: pmpattern}, function(response) {
-			if (chrome.runtime.lastError)
-				setTimeout(reload_it, 1000);
-			if (response.findresult == "yes") {
+			if (!chrome.runtime.lastError && response.findresult == "yes") {
 				reload_cancel(tabId, 'yes');
 				// notification & tab handling
 				chrome.tabs.get(tabId, function (tab) {
@@ -386,7 +384,7 @@ function reload_it(tabId, tab_url) {
 			} else {
 				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 				updateTab(tabId, tab_url);
-			 }
+			}
 			});
 		}
 	} else {
