@@ -372,7 +372,6 @@ function reload_it(tabId, tab_url) {
 				// notification & tab handling
 				tabs[tabId]['pre_url'] = "https://www.zotacstore.com/us/checkout/onepage/";
 				stopat = tabs[tabId]['count'];
-				tabs[tabId]['pmpattern'] = 'E';
 				chrome.tabs.get(tabId, function (tab) {
 					chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
 						// draw attention to target window if it's not focused inside Chrome
