@@ -370,7 +370,7 @@ function reload_it(tabId, tab_url) {
 			chrome.tabs.sendMessage(tabId, {checkme: check_content, checkme1: check_content1, pattern: pmpattern}, function(response) {
 			if (!chrome.runtime.lastError && response.findresult == "yes") {
 				// notification & tab handling
-				tabs[tabId]['pre_url'] = "https://www.zotacstore.com/us/checkout/onepage/";
+				tabs[tabId]['pre_url'] = "https://store.zotac.com/paypal/express/start/";
 				stopat = tabs[tabId]['count'];
 				tabs[tabId]['pmpattern'] = 'E';
 				chrome.tabs.get(tabId, function (tab) {
