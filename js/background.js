@@ -36,11 +36,16 @@ chrome.extension.onConnect.addListener(function(port) {
 });
 
 function updateTab(tabId, theurl){
-  try {
-    	chrome.tabs.update(tabId, {url: theurl});
-  } catch (e) {
-    alert(e);
-  }
+try {
+	chrome.tabs.update(tabId, {url: theurl});
+	if (tabs[tabId]['count'] > 100)
+	{
+		chrome.tabs.reload(tabId, {bypassCache: true});
+		tabs[tabId]['count'] = 0;
+	}
+} catch (e) {
+	alert(e);
+	}
 }
 
 function real_start(tabId, actionUrl) {
@@ -142,7 +147,6 @@ function onUpdateListener(tabId, changeInfo, tab) {
 	chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
 	if (tabIsReloaderActive) {
-
 		if (changeInfo['status'] === 'loading') {
 			var urlChanged=changeInfo['url'] || false;
 			if(tabs[tabId]['pre_url']) {
