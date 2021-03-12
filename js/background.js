@@ -35,14 +35,21 @@ chrome.extension.onConnect.addListener(function(port) {
 	}
 });
 
+var cachetime = 0;
+
 function updateTab(tabId, theurl){
 try {
-	chrome.tabs.update(tabId, {url: theurl});
-	if (tabs[tabId]['count'] > 100)
+	if (localStorage['cachereloadinterv'] > -1)
 	{
-		chrome.tabs.reload(tabId, {bypassCache: true});
-		tabs[tabId]['count'] = 0;
-	}
+		var t = new Date().getTime();
+		if (t > cachetime)
+		{
+			chrome.tabs.reload(tabId, {bypassCache: true});
+			cachetime = t + localStorage['cachereloadinterv'] * 1000;
+		} else
+			chrome.tabs.update(tabId, {url: theurl});
+	} else
+		chrome.tabs.update(tabId, {url: theurl});
 } catch (e) {
 	alert(e);
 	}

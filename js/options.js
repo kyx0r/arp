@@ -60,11 +60,11 @@ function save_options(){
 	} else if (getId('pm_sound_til_timeout').checked) {
 		localStorage['pm_sound_til'] = 'timeout';
 	}
-
 	localStorage['pm_sound_timeout']  = getId('pm_sound_timeout').value;
 
+	localStorage['cachereloadinterv'] = getId('cachereloadinterv').value;
 
-  localStorage.support = !(getId('dontsupport').checked);
+	localStorage.support = !(getId('dontsupport').checked);
 
 	show_save_animation();
 }
@@ -127,6 +127,7 @@ function read_options(){
 	}
 	getId('pm_sound_til_' + localStorage['pm_sound_til']).checked = true;
 	getId('pm_sound_timeout').value = localStorage['pm_sound_timeout'] || 5;
+	getId('cachereloadinterv').value = localStorage['cachereloadinterv'] || -1;
 
 	getId('dontsupport').checked = (localStorage.support == 'false');
 }
