@@ -60,7 +60,7 @@ function get_interval( )
 			interval_time = radio_arr[i].value;
 			time_result[0] = interval_time;
 			time_result[1] = 'customDropdown';
-		} 
+		}
 		else {
 			interval_time = radio_arr[i].value;
 			time_result[0] = interval_time;
@@ -94,56 +94,58 @@ function set_interval(time_interval, time_type) {
   var radio_arr = document.getElementsByName("reloadOption");
   for(i = 0 ; i < radio_arr.length; i++) {
     if(radio_arr[i].value == time_interval) {
-        radio_arr[i].checked = true;
-        return;
+	radio_arr[i].checked = true;
+	return;
     }
   }
 }
 
 function startRefresh() {
-  if ( getId("startbtn").value == "Start" ) {
-
-	getId("startbtn").classList.add("stop");
-	getId("startbtn").value = "Stop";
-
-	getId("timerbtn").value = "Start Timer";
-	getId("timerbtn").classList.remove("stop");
-
-	var myInterval = get_interval();
-	var views = chrome.extension.getViews();
-	var checkme = getId("contentid").value;
-	var checkme1 = getId("contentid1").value;
-	var preurl = getId("pdurlinp").value;
-
-    for (var i in views) {
-			if(checkme) {
-				var page_monitor_pattern = getId("pmpattern").value;
-				if (views[i].loop_start) {
-					views[i].loop_start(-1, myInterval[0], myInterval[1], checkme, checkme1, page_monitor_pattern, preurl);
-				}
-			} else {
-				if (views[i].loop_start) {
-					views[i].loop_start(-1, myInterval[0], myInterval[1], null, null, null, preurl);
-				}
+	if ( getId("startbtn").value == "Start" ) {
+		getId("startbtn").classList.add("stop");
+		getId("startbtn").value = "Stop";
+	
+		getId("timerbtn").value = "Start Timer";
+		getId("timerbtn").classList.remove("stop");
+	
+		var myInterval = get_interval();
+		var views = chrome.extension.getViews();
+		var checkme = getId("contentid").value;
+		var page_monitor_pattern = getId("pmpattern").value;
+		if (!checkme)
+		{
+			checkme = getId("contentid1").value;
+			page_monitor_pattern = getId("pmpattern1").value;
+		}
+		var preurl = getId("pdurlinp").value;
+	
+		for (var i in views) {
+			if (views[i].loop_start) {
+				views[i].loop_start(-1, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl);
 			}
 		}
-  } else {
-    getId("startbtn").value = "Start";
-    getId("startbtn").classList.remove("stop");
-    var views = chrome.extension.getViews();
-    for (var i in views) {
-        if (views[i].loop_stop) {
-            views[i].loop_stop();
-        }
-    }
-  }
+	} else {
+		getId("startbtn").value = "Start";
+		getId("startbtn").classList.remove("stop");
+		var views = chrome.extension.getViews();
+		for (var i in views) {
+			if (views[i].loop_stop) {
+				views[i].loop_stop();
+			}
+		}
+	}
 }
 
 function startTimer() {
   if (getId("timerbtn").value == "Start Timer" ) {
 	var myInterval = get_interval();
 	var checkme = getId("contentid").value;
-	var checkme1 = getId("contentid1").value;
+	var page_monitor_pattern = getId("pmpattern").value;
+	if (!checkme)
+	{
+		checkme = getId("contentid1").value;
+		page_monitor_pattern = getId("pmpattern1").value;
+	}
 	var preurl = getId("pdurlinp").value;
 
   	var timer_mode = getId("timermode").value;
@@ -163,15 +165,8 @@ function startTimer() {
 		} else {
 			var views = chrome.extension.getViews();
 			for (var i in views) {
-				if(checkme) {
-					var page_monitor_pattern = getId("pmpattern").value;
-					if (views[i].loop_start) {
-						views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, checkme1, page_monitor_pattern, preurl);
-					}
-				} else {
-					if (views[i].loop_start) {
-						views[i].loop_start(waitTime, myInterval[0], myInterval[1], null, null, null, preurl);
-					}
+				if (views[i].loop_start) {
+					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl);
 				}
 			}
 			getId("timerbtn").value = "Cancel Timer";
@@ -203,15 +198,9 @@ function startTimer() {
 			var waitTime = dDate+" "+dTime;
 			var views = chrome.extension.getViews();
 			for (var i in views) {
-				if(checkme) {
-					var page_monitor_pattern = getId("pmpattern").value;
-					if (views[i].loop_start) {
-						views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, checkme1, page_monitor_pattern, preurl);
-					}
-				} else {
-					if (views[i].loop_start) {
-						views[i].loop_start(waitTime, myInterval[0], myInterval[1], null, null, null, preurl);
-					}
+				var page_monitor_pattern = getId("pmpattern").value;
+				if (views[i].loop_start) {
+					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl);
 				}
 			}
 			getId("timerbtn").value = "Cancel Timer";
@@ -226,9 +215,9 @@ function startTimer() {
     getId("timerbtn").classList.remove("stop");
     var views = chrome.extension.getViews();
     for (var i in views) {
-        if (views[i].loop_stop) {
-            views[i].loop_stop();
-        }
+	if (views[i].loop_stop) {
+	    views[i].loop_stop();
+	}
     }
   }
 }
@@ -316,10 +305,10 @@ function recvData(data){
 
 	set_interval(data.time_interval, data.time_type);
 	if(data.checkme) {
-		getId('contentid').value = data.checkme;
-	}
-	if(data.checkme1) {
-		getId('contentid1').value = data.checkme1;
+		if (data.pmpattern == 'A')
+			getId('contentid').value = data.checkme;
+		else if(data.pmpattern == 'B') 
+			getId('contentid1').value = data.checkme;
 	}
 
 	if(data.wait_time) {

@@ -27,7 +27,7 @@ chrome.extension.onConnect.addListener(function(port) {
 				getCurrentTab( function(tab) {
 					var tabIsReloaderActive = tabs[tab.id] || false;
 					if (tabIsReloaderActive) {
-						port.postMessage({status:tabs[tab.id].status, time_interval:tabs[tab.id].interval_time, time_type:tabs[tab.id].time_type, checkme:tabs[tab.id].checkme, checkme1:tabs[tab.id].checkme1, wait_time:tabs[tab.id].wait_time});
+						port.postMessage({status:tabs[tab.id].status, time_interval:tabs[tab.id].interval_time, time_type:tabs[tab.id].time_type, checkme:tabs[tab.id].checkme, pmpattern:tabs[tab.id].pmpattern, wait_time:tabs[tab.id].wait_time});
 					}
 				});
 			}
@@ -67,7 +67,7 @@ function get_rand_time(tmin, tmax) {
 	return rand_time;
 }
 
-function loop_start(waitTime, interval_time, interval_type, checkme, checkme1, page_monitor_pattern, predefined_url) {
+function loop_start(waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url) {
 
 	getCurrentTab( function(tab) {
 		var currentTabId = tab.id;
@@ -99,9 +99,6 @@ function loop_start(waitTime, interval_time, interval_type, checkme, checkme1, p
 		tabs[currentTabId]['next_round'] = tabs[currentTabId]['time_between_load']/1000;
 		if(checkme) {
 			tabs[currentTabId]['checkme'] = checkme;
-		}
-		if(checkme1) {
-			tabs[currentTabId]['checkme1'] = checkme1;
 		}
 		if(page_monitor_pattern) {
 			tabs[currentTabId]['pmpattern'] = page_monitor_pattern;
@@ -293,7 +290,7 @@ chrome.notifications.onClosed.addListener(function (id) {
 	delete onClickForNotifications[id];
 });
 
-function show_notification(pmpattern, check_content, onclick) {
+function show_notification(tabId, pmpattern, check_content, onclick) {
 	var action = (pmpattern == 'B') ? 'Lost' : 'Found';
 	var time = /(..):(..)/.exec(new Date);       // The prettyprinted time.
 	var hour = time[1] % 12 || 12;               // The prettyprinted hour.
@@ -365,24 +362,18 @@ function pause_sound_with_fadeout(sound) {
 	}, 16)
 }
 
-var stopat = -1;
-
 function reload_it(tabId, tab_url) {
-	if(tabs[tabId]['checkme']) {
-		var check_content = tabs[tabId]['checkme'];
-		var check_content1 = tabs[tabId]['checkme1'];
+	var check_content = tabs[tabId]['checkme'];
+	if(check_content) {
 		var pmpattern = tabs[tabId]['pmpattern'];
 
-		if (tabs[tabId]['count'] == stopat)
-			reload_cancel(tabId, 'yes');
 		if(tabs[tabId]['count'] == 0) {
 			updateTab(tabId, tab_url);
 		} else {
-			chrome.tabs.sendMessage(tabId, {checkme: check_content, checkme1: check_content1, pattern: pmpattern}, function(response) {
+			chrome.tabs.sendMessage(tabId, {checkme: check_content, pattern: pmpattern}, function(response) {
 			if (!chrome.runtime.lastError && response.findresult == "yes") {
 				// notification & tab handling
-				tabs[tabId]['pre_url'] = "https://store.zotac.com/paypal/express/start/";
-				stopat = tabs[tabId]['count'];
+				reload_cancel(tabId, 'yes');
 				chrome.tabs.get(tabId, function (tab) {
 					chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
 						// draw attention to target window if it's not focused inside Chrome
@@ -392,11 +383,10 @@ function reload_it(tabId, tab_url) {
 							chrome.tabs.update(tabId, {active: true});
 						}
 						// show notification box
-						show_notification(pmpattern, check_content, function () {
+						show_notification(tabId, pmpattern, check_content, function () {
 							// switch to target tab & its window upon clicking the box
 							chrome.tabs.update(tabId, {active: true});
 							chrome.windows.update(tab.windowId, {focused: true});
-							reload_cancel(tabId, 'yes');
 						});
 					});
 				});

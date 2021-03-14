@@ -32,51 +32,31 @@ function sleep(delay) {
 
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
-    var regex = new RegExp(request.checkme, "i");
+	var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
-		var btn = document.querySelectorAll('.button.btn-cart');
-		var addtcrt = "Add to Cart";
-		var skip = 9;
-		for (var i = 0; i < btn.length; i++) {
-			if (btn[i] != null)
-			{
-				console.log(btn[i].innerText);
-				if (i >= skip && addtcrt.localeCompare(btn[i].innerText) == 0)
+			var btn = document.querySelectorAll('.button.btn-cart');
+			var addtcrt = "Add to Cart";
+			var skip = 9;
+			for (var i = 0; i < btn.length; i++) {
+				if (btn[i] != null)
 				{
-					btn[i].click();
-					break;
+					console.log(btn[i].innerText);
+					if (i >= skip && addtcrt.localeCompare(btn[i].innerText) == 0)
+					{
+						btn[i].click();
+						break;
+					}
 				}
 			}
-		}
-		if (request.checkme1)
-		{
-			var regex1 = new RegExp(request.checkme1, "i");
-			if (!regex1.test(document.body.innerHTML)) {
-				sendResponse({});
-			} else {
-				sendResponse({findresult: "yes"});
-			}
-		} else {
 			sendResponse({findresult: "yes"});
-		}
 		} else {
-		//Snub them.
-		sendResponse({});
+			//Snub them.
+			sendResponse({});
 		}
 	} else if(request.pattern == 'B') {
 		if (!regex.test(document.body.innerHTML)) {
-		if (request.checkme1)
-		{
-			var regex1 = new RegExp(request.checkme1, "i");
-			if (regex1.test(document.body.innerHTML)) {
-				sendResponse({});
-			} else {
-				sendResponse({findresult: "yes"});
-			}
-		} else {
 			sendResponse({findresult: "yes"});
-		}
 		} else {
 		//Snub them.
 		sendResponse({});
