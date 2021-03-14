@@ -118,10 +118,14 @@ function startRefresh() {
 			page_monitor_pattern = getId("pmpattern1").value;
 		}
 		var preurl = getId("pdurlinp").value;
+		var bquery = getId('bselector').value;
+		var btext = getId('btext').value;
+		var bskip = getId('bskip').value;
 	
 		for (var i in views) {
 			if (views[i].loop_start) {
-				views[i].loop_start(-1, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl);
+				views[i].loop_start(-1, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
+							bquery, btext, bskip);
 			}
 		}
 	} else {
@@ -147,6 +151,9 @@ function startTimer() {
 		page_monitor_pattern = getId("pmpattern1").value;
 	}
 	var preurl = getId("pdurlinp").value;
+	var bquery = getId('bselector').value;
+	var btext = getId('btext').value;
+	var bskip = getId('bskip').value;
 
   	var timer_mode = getId("timermode").value;
 
@@ -166,7 +173,8 @@ function startTimer() {
 			var views = chrome.extension.getViews();
 			for (var i in views) {
 				if (views[i].loop_start) {
-					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl);
+					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
+							bquery, btext, bskip);
 				}
 			}
 			getId("timerbtn").value = "Cancel Timer";
@@ -200,7 +208,8 @@ function startTimer() {
 			for (var i in views) {
 				var page_monitor_pattern = getId("pmpattern").value;
 				if (views[i].loop_start) {
-					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl);
+					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
+							bquery, btext, bskip);
 				}
 			}
 			getId("timerbtn").value = "Cancel Timer";
@@ -252,6 +261,15 @@ function restoreOptions() {
 		show(getId('pdurlbox'))
 		var pdurl = localStorage['pdurl'];
 		getId('pdurlinp').value = pdurl
+	}
+	if(localStorage['buttoncheck'] && localStorage['buttoncheck'] == 'true'){
+		show(getId('buttonclick'))
+		var bquery = localStorage['pselector'];
+		var btext = localStorage['ptext'];
+		var bskip = localStorage['pskip'];
+		getId('bselector').value = bquery
+		getId('btext').value = btext
+		getId('bskip').value = bskip
 	}
 	if(localStorage['timercheck'] && localStorage['timercheck'] == 'true') {
 		show(getId('timerbox'))

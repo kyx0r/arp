@@ -131,6 +131,7 @@ width: 80px;
 .timetbl{font-size:13px;width:100%;}
 .timetbl tr{height:28px;}
 #pdurlbox{display:none;}
+#buttonclick{display:none;}
 #timerbox{display:none;margin-top:15px;}
 #timerbox .countbox i{font-style:normal;color:red;margin:0px 5px;}
 #timerbox #countdownMode{display:none;}
@@ -282,6 +283,21 @@ fieldset {
 			</div>
 			</div>
 			<div style="margin:0 0px 5px;text-align:center;"><input id="timerbtn" type="button" value="Start Timer"></div>
+		</fieldset>
+	</div>
+	<div id="buttonclick">
+		<fieldset style="width:400px;">
+			<legend class="box-title">Click Button</legend>
+			<div style="margin:5px 0px;">
+			<div style="margin-bottom:5px;">
+			<div class="pagem"><label for="selector">Query button selector</label></div>
+			<input type="text" id="bselector" name="bselector" type="text" value="" size="55" placeholder=".button.btn-cart"><br/>
+			<div class="pagem"><label for="text">Button text</label></div>
+			<input type="text" id="btext" name="btext" type="text" value="" size="55" placeholder="Add to Cart"><br/>
+			<div class="pagem"><label for="num">Skip (n) matches</label></div>
+			<input type="text" id="bskip" name="bskip" type="number" value="0" size="10" placeholder="0"><br/>
+			</div>
+			</div>
 		</fieldset>
 	</div>
 </div>

@@ -30,25 +30,31 @@ function sleep(delay) {
 	while (new Date().getTime() < start + delay);
 }
 
+function clickbtn(request)
+{
+	if(request.query)
+	{
+		var btn = document.querySelectorAll(request.query);
+		for (var i = 0; i < btn.length; i++) {
+			if (btn[i] != null)
+			{
+				console.log(btn[i].innerText);
+				if (i >= request.skip && request.text.localeCompare(btn[i].innerText) == 0)
+				{
+					btn[i].click();
+					break;
+				}
+			}
+		}
+	}
+}
+
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
 	var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
-			var btn = document.querySelectorAll('.button.btn-cart');
-			var addtcrt = "Add to Cart";
-			var skip = 9;
-			for (var i = 0; i < btn.length; i++) {
-				if (btn[i] != null)
-				{
-					console.log(btn[i].innerText);
-					if (i >= skip && addtcrt.localeCompare(btn[i].innerText) == 0)
-					{
-						btn[i].click();
-						break;
-					}
-				}
-			}
+			clickbtn(request);
 			sendResponse({findresult: "yes"});
 		} else {
 			//Snub them.
@@ -56,6 +62,7 @@ chrome.extension.onMessage.addListener(
 		}
 	} else if(request.pattern == 'B') {
 		if (!regex.test(document.body.innerHTML)) {
+			clickbtn(request);
 			sendResponse({findresult: "yes"});
 		} else {
 		//Snub them.
