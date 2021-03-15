@@ -1,12 +1,19 @@
 
-var default_options = {}
-
 ready(() => {
 	read_options()
 	getId('save').onclick = save_options
 	getId('cancel').onclick = () => window.close()
+	getId('presets').onchange = changepreset
 	init()
 })
+
+var preset = 0;
+
+function changepreset(obj)
+{
+	preset = obj.target.value;
+	read_options()
+}
 
 // Option to save current value to localstorage
 function save_options(){
@@ -14,61 +21,61 @@ function save_options(){
 		getId('default_time').value = 0;
 	}
 
-	localStorage['default_time'] = getId('default_time').value;
-	localStorage['random_time'] = getId('randomTime').checked
-	localStorage['autostart'] = getId('autostart').checked;
-	localStorage['asurl'] = getId('asurl').value;
-	localStorage['pdcheck'] = getId('pdcheck').checked
-	localStorage['pdurl'] = getId('pdurl').value;
-	localStorage['pselector'] = getId('pselector').value;
-	localStorage['ptext'] = getId('ptext').value;
-	localStorage['pskip'] = getId('pskip').value;
-	localStorage['ptimeout'] = getId('ptimeout').value;
-	localStorage['pnclicks'] = getId('pnclicks').value;
-	localStorage['timercheck'] = getId('timercheck').checked;
-	localStorage['buttoncheck'] = getId('buttoncheck').checked
+	localStorage['default_time'+preset] = getId('default_time').value;
+	localStorage['random_time'+preset] = getId('randomTime').checked
+	localStorage['autostart'+preset] = getId('autostart').checked;
+	localStorage['asurl'+preset] = getId('asurl').value;
+	localStorage['pdcheck'+preset] = getId('pdcheck').checked
+	localStorage['pdurl'+preset] = getId('pdurl').value;
+	localStorage['pselector'+preset] = getId('pselector').value;
+	localStorage['ptext'+preset] = getId('ptext').value;
+	localStorage['pskip'+preset] = getId('pskip').value;
+	localStorage['ptimeout'+preset] = getId('ptimeout').value;
+	localStorage['pnclicks'+preset] = getId('pnclicks').value;
+	localStorage['timercheck'+preset] = getId('timercheck').checked;
+	localStorage['buttoncheck'+preset] = getId('buttoncheck').checked
 	localStorage.default_pattern = getId('defaultPattern').value;
 	localStorage.default_pattern1 = getId('defaultPattern1').value;
 
 
 	if(getId('timer01').checked) {
-		localStorage['timermode'] = '1';
+		localStorage['timermode'+preset] = '1';
 	} else {
-		localStorage['timermode'] = '2';
+		localStorage['timermode'+preset] = '2';
 	}
 
-	localStorage['pmonitor'] = getId('pmonitor').checked
+	localStorage['pmonitor'+preset] = getId('pmonitor').checked
 
 	if(getId('pagemr01').checked) {
-		localStorage['pmpattern'] = 'A';
+		localStorage['pmpattern'+preset] = 'A';
 	} else {
-		localStorage['pmpattern'] = 'B';
+		localStorage['pmpattern'+preset] = 'B';
 	}
 
 	if(getId('pmsound01').checked) {
-		localStorage['sound'] = '1';
+		localStorage['sound'+preset] = '1';
 	} else if(getId('pmsound02').checked) {
-		localStorage['sound'] = '2';
+		localStorage['sound'+preset] = '2';
 	} else if(getId('pmsound03').checked) {
-		localStorage['sound'] = '3';
+		localStorage['sound'+preset] = '3';
 	} else if(getId('pmsound04').checked) {
-		localStorage['sound'] = '4';
+		localStorage['sound'+preset] = '4';
 	}
 
-	localStorage['soundurl'] = getId('soundurl').value;
-	localStorage['soundvolume'] = getId('soundvolume').value;
+	localStorage['soundurl'+preset] = getId('soundurl').value;
+	localStorage['soundvolume'+preset] = getId('soundvolume').value;
 
 	// notification closing
 	if (getId('pm_sound_til_click').checked) {
-		localStorage['pm_sound_til'] = 'click';
+		localStorage['pm_sound_til'+preset] = 'click';
 	} else if (getId('pm_sound_til_sound').checked) {
-		localStorage['pm_sound_til'] = 'sound';
+		localStorage['pm_sound_til'+preset] = 'sound';
 	} else if (getId('pm_sound_til_timeout').checked) {
-		localStorage['pm_sound_til'] = 'timeout';
+		localStorage['pm_sound_til'+preset] = 'timeout';
 	}
-	localStorage['pm_sound_timeout']  = getId('pm_sound_timeout').value;
+	localStorage['pm_sound_timeout'+preset]  = getId('pm_sound_timeout').value;
 
-	localStorage['cachereloadinterv'] = getId('cachereloadinterv').value;
+	localStorage['cachereloadinterv'+preset] = getId('cachereloadinterv').value;
 
 	localStorage.support = !(getId('dontsupport').checked);
 
@@ -76,30 +83,30 @@ function save_options(){
 }
 
 function read_options(){
-	if(localStorage['default_time']) {
-		getId('default_time').value = localStorage['default_time'];
+	if(localStorage['default_time'+preset]) {
+		getId('default_time').value = localStorage['default_time'+preset];
 	}
 
- 	getId('randomTime').checked  = (localStorage['random_time'] == 'true');
- 	getId('autostart').checked  = (localStorage['autostart'] == 'true');
- 	getId('pdcheck').checked  = (localStorage['pdcheck'] == 'true');
- 	getId('pmonitor').checked  = (localStorage['pmonitor'] == 'true');
- 	getId('timercheck').checked  = (localStorage['timercheck'] == 'true');
- 	getId('buttoncheck').checked  = (localStorage['buttoncheck'] == 'true');
+ 	getId('randomTime').checked  = (localStorage['random_time'+preset] == 'true');
+ 	getId('autostart').checked  = (localStorage['autostart'+preset] == 'true');
+ 	getId('pdcheck').checked  = (localStorage['pdcheck'+preset] == 'true');
+ 	getId('pmonitor').checked  = (localStorage['pmonitor'+preset] == 'true');
+ 	getId('timercheck').checked  = (localStorage['timercheck'+preset] == 'true');
+ 	getId('buttoncheck').checked  = (localStorage['buttoncheck'+preset] == 'true');
 
-	getId('asurl').value = localStorage['asurl'] || '';
+	getId('asurl').value = localStorage['asurl'+preset] || '';
 
 	// timer
-	if(localStorage['timermode']) {
-		if(localStorage['timermode'] == '1') {
+	if(localStorage['timermode'+preset]) {
+		if(localStorage['timermode'+preset] == '1') {
 			getId('timer01').checked = true;
-		} else if(localStorage['timermode'] == '2') {
+		} else if(localStorage['timermode'+preset] == '2') {
 			getId('timer02').checked = true;
 		}
 	} else {
 		getId('timer01').checked = true;
 	}
-	if(localStorage['pmpattern'] && localStorage['pmpattern'] == 'B') {
+	if(localStorage['pmpattern'+preset] && localStorage['pmpattern'+preset] == 'B') {
 		getId('pagemr02').checked = true;
 	} else {
 		getId('pagemr01').checked = true;
@@ -113,33 +120,33 @@ function read_options(){
 	}
 
  	// sound
-	if(localStorage['sound'] && localStorage['sound'] == '2') {
+	if(localStorage['sound'+preset] && localStorage['sound'+preset] == '2') {
 		getId('pmsound02').checked = true;
-	} else if(localStorage['sound'] && localStorage['sound'] == '3') {
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '3') {
 		getId('pmsound03').checked = true;
-	} else if(localStorage['sound'] && localStorage['sound'] == '4') {
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '4') {
 		getId('pmsound04').checked = true;
 	} else {
 		getId('pmsound01').checked = true;
 	}
-	getId('soundvolume').value = localStorage['soundvolume'];
+	getId('soundvolume').value = localStorage['soundvolume'+preset];
 
-	getId('pdurl').value = localStorage['pdurl'] || '';
-	getId('pselector').value = localStorage['pselector'] || '';
-	getId('ptext').value = localStorage['ptext'] || '';
-	getId('pskip').value = localStorage['pskip'] || '';
-	getId('ptimeout').value = localStorage['ptimeout'] || '';
-	getId('pnclicks').value = localStorage['pnclicks'] || '';
-	getId('soundurl').value = localStorage['soundurl'] || '';
+	getId('pdurl').value = localStorage['pdurl'+preset] || '';
+	getId('pselector').value = localStorage['pselector'+preset] || '';
+	getId('ptext').value = localStorage['ptext'+preset] || '';
+	getId('pskip').value = localStorage['pskip'+preset] || '';
+	getId('ptimeout').value = localStorage['ptimeout'+preset] || '';
+	getId('pnclicks').value = localStorage['pnclicks'+preset] || '';
+	getId('soundurl').value = localStorage['soundurl'+preset] || '';
 
 
 	// notification closing
-	if (!localStorage['pm_sound_til']) {
-		localStorage['pm_sound_til'] = 'click';
+	if (!localStorage['pm_sound_til'+preset]) {
+		localStorage['pm_sound_til'+preset] = 'click';
 	}
-	getId('pm_sound_til_' + localStorage['pm_sound_til']).checked = true;
-	getId('pm_sound_timeout').value = localStorage['pm_sound_timeout'] || 5;
-	getId('cachereloadinterv').value = localStorage['cachereloadinterv'] || -1;
+	getId('pm_sound_til_' + localStorage['pm_sound_til'+preset]).checked = true;
+	getId('pm_sound_timeout').value = localStorage['pm_sound_timeout'+preset] || 5;
+	getId('cachereloadinterv').value = localStorage['cachereloadinterv'+preset] || -1;
 
 	getId('dontsupport').checked = (localStorage.support == 'false');
 }

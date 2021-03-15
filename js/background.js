@@ -1,4 +1,6 @@
 
+var preset = localStorage['preset'];
+
 function getCurrentTab(callback) {
     chrome.tabs.query(
         {  currentWindow: true, active: true, windowType:'normal' },
@@ -6,16 +8,16 @@ function getCurrentTab(callback) {
     );
 }
 
-if (typeof localStorage['soundvolume'] == 'undefined')
-	localStorage['soundvolume'] = 1;
+if (typeof localStorage['soundvolume'+preset] == 'undefined')
+	localStorage['soundvolume'+preset] = 1;
 
 
 var tabs = new Array();
-var auto_start_url = localStorage['asurl'];
-if (localStorage['autostart'] == "true" && auto_start_url) {
+var auto_start_url = localStorage['asurl'+preset];
+if (localStorage['autostart'+preset] == "true" && auto_start_url) {
 	var default_time = 5000;
-	if(localStorage['default_time']) {
-		default_time = localStorage['default_time'] * 1000;
+	if(localStorage['default_time'+preset]) {
+		default_time = localStorage['default_time'+preset] * 1000;
 	}
 	loop_start(-1, default_time, 'C', '', '', '', auto_start_url);
 }
@@ -39,13 +41,13 @@ var cachetime = 0;
 
 function updateTab(tabId, theurl){
 try {
-	if (localStorage['cachereloadinterv'] > -1)
+	if (localStorage['cachereloadinterv'+preset] > -1)
 	{
 		var t = new Date().getTime();
 		if (t > cachetime)
 		{
 			chrome.tabs.reload(tabId, {bypassCache: true});
-			cachetime = t + localStorage['cachereloadinterv'] * 1000;
+			cachetime = t + localStorage['cachereloadinterv'+preset] * 1000;
 		} else
 			chrome.tabs.update(tabId, {url: theurl});
 	} else
@@ -328,13 +330,13 @@ function show_notification(tabId, pmpattern, check_content, onclick) {
 	notification.onclose = pause_sound;
 
 	var sound_file = '';
-	if(localStorage['sound'] && localStorage['sound'] == '2') {
+	if(localStorage['sound'+preset] && localStorage['sound'+preset] == '2') {
 		sound_file = './sound/sound1.mp3';
-	} else if(localStorage['sound'] && localStorage['sound'] == '3') {
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '3') {
 		sound_file = './sound/sound2.mp3';
-	} else if(localStorage['sound'] && localStorage['sound'] == '4') {
-		if(localStorage['soundurl']) {
-			sound_file = localStorage['soundurl'];
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '4') {
+		if(localStorage['soundurl'+preset]) {
+			sound_file = localStorage['soundurl'+preset];
 		} else {
 			sound_file = './sound/sound1.mp3';
 		}
@@ -348,11 +350,11 @@ function show_notification(tabId, pmpattern, check_content, onclick) {
 	//var pause_sound = sound_elem.pause.bind(sound_elem);
 	if (sound_file) {
 		sound_elem.src = sound_file;
-		sound_elem.loop = (localStorage['pm_sound_til'] != 'sound');
+		sound_elem.loop = (localStorage['pm_sound_til'+preset] != 'sound');
 		sound_elem.play();
-		sound_elem.volume = localStorage['soundvolume'];
-		if (localStorage['pm_sound_til'] == 'timeout') {
-			setTimeout(pause_sound, localStorage['pm_sound_timeout']*1000 || 5000);
+		sound_elem.volume = localStorage['soundvolume'+preset];
+		if (localStorage['pm_sound_til'+preset] == 'timeout') {
+			setTimeout(pause_sound, localStorage['pm_sound_timeout'+preset]*1000 || 5000);
 		}
 	}
 }

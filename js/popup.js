@@ -1,6 +1,15 @@
+
+var preset = 0;
+
 ready(() => {
-  setTimeout(restoreOptions, 1);
-  populateCustom(); // Populate the custom time dropdown with options
+	if(localStorage['preset'])
+	{
+		preset = localStorage['preset'];
+		getId('ppresets').value = preset;
+	}
+	getId('ppresets').onchange = changepreset
+	setTimeout(restoreOptions, 1);
+	populateCustom(); // Populate the custom time dropdown with options
 	getId('startbtn').onclick = startRefresh
 	getId('default-value-button').onclick = () =>
 		getId('contentid').value = localStorage.default_pattern
@@ -26,6 +35,12 @@ ready(() => {
 	getId('timerbtn').onclick = startTimer
 })
 
+function changepreset(obj)
+{
+	preset = obj.target.value;
+	localStorage['preset'] = preset;
+	restoreOptions();
+}
 
 function get_interval( )
 {
@@ -236,13 +251,14 @@ function startTimer() {
 }
 
 function restoreOptions() {
-	if(localStorage['default_time']) {
-		set_interval(localStorage['default_time'] * 1000, "custom");
+	if(localStorage['default_time'+preset]) {
+		set_interval(localStorage['default_time'+preset] * 1000, "custom");
 	}
-	if(localStorage['random_time'] == 'true') {
+	if(localStorage['random_time'+preset] == 'true') {
 		show(getId('randombox'))
-	}
-	if(localStorage['pmonitor'] && localStorage['pmonitor'] == 'true'){
+	} else
+		hide(getId('randombox'))
+	if(localStorage['pmonitor'+preset] && localStorage['pmonitor'+preset] == 'true'){
 		show(getId('monitorbox'))
 		if(!localStorage.default_pattern){ // only show button if default text is set
 			getId('default-value-button').classList.toggle('hideButton')
@@ -250,7 +266,7 @@ function restoreOptions() {
 		if(!localStorage.default_pattern){ // only show button if default text is set
 			getId('default-value-button1').classList.toggle('hideButton')
 		}
-		if(localStorage['pmpattern'] && localStorage['pmpattern'] == 'B') {
+		if(localStorage['pmpattern'+preset] && localStorage['pmpattern'+preset] == 'B') {
 			show(getId('pagemr02'))
 			hide(getId('pagemr01'))
 			getId('pmpattern').value = 'B'
@@ -260,28 +276,31 @@ function restoreOptions() {
 			getId('pmpattern').value = 'A'
 		}
 		show(getId('pagemr03'))
-	}
-	if(localStorage['pdcheck'] && localStorage['pdcheck'] == 'true'){
+	} else 
+		hide(getId('monitorbox'))
+	if(localStorage['pdcheck'+preset] && localStorage['pdcheck'+preset] == 'true'){
 		show(getId('pdurlbox'))
-		var pdurl = localStorage['pdurl'];
+		var pdurl = localStorage['pdurl'+preset];
 		getId('pdurlinp').value = pdurl
-	}
-	if(localStorage['buttoncheck'] && localStorage['buttoncheck'] == 'true'){
+	} else 
+		hide(getId('pdurlbox'))
+	if(localStorage['buttoncheck'+preset] && localStorage['buttoncheck'+preset] == 'true'){
 		show(getId('buttonclick'))
-		var bquery = localStorage['pselector'];
-		var btext = localStorage['ptext'];
-		var bskip = localStorage['pskip'];
-		var btimeout = localStorage['ptimeout'];
-		var bnclicks = localStorage['pclicks'];
+		var bquery = localStorage['pselector'+preset];
+		var btext = localStorage['ptext'+preset];
+		var bskip = localStorage['pskip'+preset];
+		var btimeout = localStorage['ptimeout'+preset];
+		var bnclicks = localStorage['pnclicks'+preset];
 		getId('bselector').value = bquery
 		getId('btext').value = btext
 		getId('bskip').value = bskip
 		getId('btimeout').value = btimeout
 		getId('bnclicks').value = bnclicks
-	}
-	if(localStorage['timercheck'] && localStorage['timercheck'] == 'true') {
+	} else
+		hide(getId('buttonclick'))
+	if(localStorage['timercheck'+preset] && localStorage['timercheck'+preset] == 'true') {
 		show(getId('timerbox'))
-		if(localStorage['timermode'] == "1") {
+		if(localStorage['timermode'+preset] == "1") {
 			show(getId('countdownMode'))
 			getId('timermode').value = '1'
 
@@ -295,15 +314,16 @@ function restoreOptions() {
 			getId('dateInp').value = dDate
 			getId('timeInp').value = dTime
 		}
-	}
+	} else 
+		hide(getId('timerbox'))
 	// Set times if already defined
-	if(localStorage['customHour']){
+	if(localStorage['customHour'+preset]){
 		getId('hours').value = localStorage.customHour
 	}
-	if(localStorage['customMinute']){
+	if(localStorage['customMinute'+preset]){
 		getId('minutes').value = localStorage.customMinute
 	}
-	if(localStorage['customSecond']){
+	if(localStorage['customSecond'+preset]){
 		getId('seconds').value = localStorage.customSecond
 	}
 
