@@ -30,22 +30,30 @@ function sleep(delay) {
 	while (new Date().getTime() < start + delay);
 }
 
-function clickbtn(request)
+function clickbtn(request, timeout)
 {
 	if(request.query)
 	{
 		var btn = document.querySelectorAll(request.query);
+		//console.log(document.body.innerHTML);
 		for (var i = 0; i < btn.length; i++) {
-			if (btn[i] != null)
+			if(btn[i] != null)
 			{
-				console.log(btn[i].innerText);
-				if (i >= request.skip && request.text.localeCompare(btn[i].innerText) == 0)
+				//console.log(btn[i].innerText);
+				if(i >= request.skip && request.text.localeCompare(btn[i].innerText) == 0)
 				{
-					btn[i].click();
-					break;
+					if(request.text)
+					{
+						if(request.text.localeCompare(btn[i].innerText) == 0)
+							btn[i].click();
+					} else {
+							btn[i].click();
+					}
+					return;
 				}
 			}
 		}
+		setTimeout(clickbtn, timeout, request); //element not there yet
 	}
 }
 
@@ -54,7 +62,7 @@ chrome.extension.onMessage.addListener(
 	var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
-			clickbtn(request);
+			clickbtn(request, 100);
 			sendResponse({findresult: "yes"});
 		} else {
 			//Snub them.
@@ -62,7 +70,7 @@ chrome.extension.onMessage.addListener(
 		}
 	} else if(request.pattern == 'B') {
 		if (!regex.test(document.body.innerHTML)) {
-			clickbtn(request);
+			clickbtn(request, 100);
 			sendResponse({findresult: "yes"});
 		} else {
 		//Snub them.

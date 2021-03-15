@@ -86,7 +86,7 @@ function loop_start(waitTime, interval_time, interval_type, checkme, page_monito
 		} else {
 			tabs[currentTabId]['action_url'] = tab.url;
 		}
-		if(bquery && btext)
+		if(bquery)
 		{
 			tabs[currentTabId]['bquery'] = bquery;
 			tabs[currentTabId]['btext'] = btext;
