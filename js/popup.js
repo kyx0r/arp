@@ -12,9 +12,9 @@ ready(() => {
 	populateCustom(); // Populate the custom time dropdown with options
 	getId('startbtn').onclick = startRefresh
 	getId('default-value-button').onclick = () =>
-		getId('contentid').value = localStorage.default_pattern
+		getId('contentid').value = localStorage['dpattern'+preset]
 	getId('default-value-button1').onclick = () =>
-		getId('contentid1').value = localStorage.default_pattern1
+		getId('contentid1').value = localStorage['dpattern1'+preset]
 	getId('r08').onclick = () => getId('tcustom').focus()
 	getId('tcustom').onfocus = () => getId('r08').checked = true
 	getId('r07').onclick = () => getId('tmin').focus()
@@ -260,12 +260,14 @@ function restoreOptions() {
 		hide(getId('randombox'))
 	if(localStorage['pmonitor'+preset] && localStorage['pmonitor'+preset] == 'true'){
 		show(getId('monitorbox'))
-		if(!localStorage.default_pattern){ // only show button if default text is set
-			getId('default-value-button').classList.toggle('hideButton')
-		}
-		if(!localStorage.default_pattern){ // only show button if default text is set
-			getId('default-value-button1').classList.toggle('hideButton')
-		}
+		if(localStorage['dpattern'+preset]){ // only show button if default text is set
+			show(getId('default-value-button'))
+		} else 
+			hide(getId('default-value-button'))
+		if(localStorage['dpattern1'+preset]){ // only show button if default text is set
+			show(getId('default-value-button1'))
+		} else
+			hide(getId('default-value-button1'))
 		if(localStorage['pmpattern'+preset] && localStorage['pmpattern'+preset] == 'B') {
 			show(getId('pagemr02'))
 			hide(getId('pagemr01'))

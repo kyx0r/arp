@@ -1,0 +1,15 @@
+https://www.zotacstore.com/us/customer/account/index/
+LOGIN OR CREATE AN ACCOUNT
+queryselector = .button
+text = Login
+
+https://www.zotacstore.com/us/wishlist/index/index/
+ADD ALL
+queryselector = .button.btn-cart
+text = Add to Cart
+skip = 9
+
+https://store.zotac.com/paypal/express/start/
+queryselector = .ppvx_btn___5-7-4
+timeout = 100
+nclicks = 50

@@ -34,8 +34,8 @@ function save_options(){
 	localStorage['pnclicks'+preset] = getId('pnclicks').value;
 	localStorage['timercheck'+preset] = getId('timercheck').checked;
 	localStorage['buttoncheck'+preset] = getId('buttoncheck').checked
-	localStorage.default_pattern = getId('defaultPattern').value;
-	localStorage.default_pattern1 = getId('defaultPattern1').value;
+	localStorage['dpattern'+preset] = getId('defaultPattern').value;
+	localStorage['dpattern1'+preset] = getId('defaultPattern1').value;
 
 
 	if(getId('timer01').checked) {
@@ -112,12 +112,8 @@ function read_options(){
 		getId('pagemr01').checked = true;
 	}
 
-	if(localStorage.default_pattern){
-		getId('defaultPattern').value = localStorage.default_pattern;
-	}
-	if(localStorage.default_pattern1){
-		getId('defaultPattern1').value = localStorage.default_pattern1;
-	}
+	getId('defaultPattern').value = localStorage['dpattern'+preset] || '';
+	getId('defaultPattern1').value = localStorage['dpattern1'+preset] || '';
 
  	// sound
 	if(localStorage['sound'+preset] && localStorage['sound'+preset] == '2') {
