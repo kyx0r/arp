@@ -23,6 +23,8 @@ function save_options(){
 	localStorage['pselector'] = getId('pselector').value;
 	localStorage['ptext'] = getId('ptext').value;
 	localStorage['pskip'] = getId('pskip').value;
+	localStorage['ptimeout'] = getId('ptimeout').value;
+	localStorage['pnclicks'] = getId('pnclicks').value;
 	localStorage['timercheck'] = getId('timercheck').checked;
 	localStorage['buttoncheck'] = getId('buttoncheck').checked
 	localStorage.default_pattern = getId('defaultPattern').value;
@@ -126,6 +128,8 @@ function read_options(){
 	getId('pselector').value = localStorage['pselector'] || '';
 	getId('ptext').value = localStorage['ptext'] || '';
 	getId('pskip').value = localStorage['pskip'] || '';
+	getId('ptimeout').value = localStorage['ptimeout'] || '';
+	getId('pnclicks').value = localStorage['pnclicks'] || '';
 	getId('soundurl').value = localStorage['soundurl'] || '';
 
 

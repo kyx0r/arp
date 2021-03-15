@@ -30,7 +30,7 @@ function sleep(delay) {
 	while (new Date().getTime() < start + delay);
 }
 
-function clickbtn(request, timeout)
+function clickbtn(request)
 {
 	if(request.query)
 	{
@@ -40,20 +40,24 @@ function clickbtn(request, timeout)
 			if(btn[i] != null)
 			{
 				//console.log(btn[i].innerText);
-				if(i >= request.skip && request.text.localeCompare(btn[i].innerText) == 0)
+				if(i >= request.skip)
 				{
 					if(request.text)
 					{
 						if(request.text.localeCompare(btn[i].innerText) == 0)
 							btn[i].click();
 					} else {
+							//console.log("click");
 							btn[i].click();
 					}
-					return;
+					if(request.clicks == 0)
+						return;
+					request.clicks--;
+					break;
 				}
 			}
 		}
-		setTimeout(clickbtn, timeout, request); //element not there yet
+		setTimeout(clickbtn, request.timeout, request); //element not there yet
 	}
 }
 
@@ -62,7 +66,7 @@ chrome.extension.onMessage.addListener(
 	var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
-			clickbtn(request, 100);
+			clickbtn(request);
 			sendResponse({findresult: "yes"});
 		} else {
 			//Snub them.
@@ -70,7 +74,7 @@ chrome.extension.onMessage.addListener(
 		}
 	} else if(request.pattern == 'B') {
 		if (!regex.test(document.body.innerHTML)) {
-			clickbtn(request, 100);
+			clickbtn(request);
 			sendResponse({findresult: "yes"});
 		} else {
 		//Snub them.

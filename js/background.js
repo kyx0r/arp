@@ -68,7 +68,7 @@ function get_rand_time(tmin, tmax) {
 }
 
 function loop_start(waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
-			bquery, btext, bskip) {
+			bquery, btext, bskip, btimeout, bnclicks) {
 
 	getCurrentTab( function(tab) {
 		var currentTabId = tab.id;
@@ -91,6 +91,8 @@ function loop_start(waitTime, interval_time, interval_type, checkme, page_monito
 			tabs[currentTabId]['bquery'] = bquery;
 			tabs[currentTabId]['btext'] = btext;
 			tabs[currentTabId]['bskip'] = bskip;
+			tabs[currentTabId]['btimeout'] = btimeout;
+			tabs[currentTabId]['bnclicks'] = bnclicks;
 		}
 		tabs[currentTabId]['interval_time'] = interval_time;
 		if(interval_type == 'rand') {
@@ -376,12 +378,15 @@ function reload_it(tabId, tab_url) {
 		var bquery = tabs[tabId]['bquery'];
 		var btext = tabs[tabId]['btext'];
 		var bskip = tabs[tabId]['bskip'];
+		var btimeout = tabs[tabId]['btimeout'];
+		var bnclicks = tabs[tabId]['bnclicks'];
 
 		if(tabs[tabId]['count'] == 0) {
 			updateTab(tabId, tab_url);
 		} else {
 			chrome.tabs.sendMessage(tabId, 
-				{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip},
+				{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
+				timeout: btimeout, clicks: bnclicks},
 				function(response) {
 			if (!chrome.runtime.lastError && response.findresult == "yes") {
 				// notification & tab handling

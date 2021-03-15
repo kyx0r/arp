@@ -121,11 +121,13 @@ function startRefresh() {
 		var bquery = getId('bselector').value;
 		var btext = getId('btext').value;
 		var bskip = getId('bskip').value;
+		var btimeout = getId('btimeout').value;
+		var bnclicks = getId('bnclicks').value;
 	
 		for (var i in views) {
 			if (views[i].loop_start) {
 				views[i].loop_start(-1, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
-							bquery, btext, bskip);
+							bquery, btext, bskip, btimeout, bnclicks);
 			}
 		}
 	} else {
@@ -154,6 +156,8 @@ function startTimer() {
 	var bquery = getId('bselector').value;
 	var btext = getId('btext').value;
 	var bskip = getId('bskip').value;
+	var btimeout = getId('btimeout').value;
+	var bnclicks = getId('bnclicks').value;
 
   	var timer_mode = getId("timermode").value;
 
@@ -174,7 +178,7 @@ function startTimer() {
 			for (var i in views) {
 				if (views[i].loop_start) {
 					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
-							bquery, btext, bskip);
+							bquery, btext, bskip, btimeout, bnclicks);
 				}
 			}
 			getId("timerbtn").value = "Cancel Timer";
@@ -209,7 +213,7 @@ function startTimer() {
 				var page_monitor_pattern = getId("pmpattern").value;
 				if (views[i].loop_start) {
 					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
-							bquery, btext, bskip);
+							bquery, btext, bskip, btimeout, bnclicks);
 				}
 			}
 			getId("timerbtn").value = "Cancel Timer";
@@ -267,9 +271,13 @@ function restoreOptions() {
 		var bquery = localStorage['pselector'];
 		var btext = localStorage['ptext'];
 		var bskip = localStorage['pskip'];
+		var btimeout = localStorage['ptimeout'];
+		var bnclicks = localStorage['pclicks'];
 		getId('bselector').value = bquery
 		getId('btext').value = btext
 		getId('bskip').value = bskip
+		getId('btimeout').value = btimeout
+		getId('bnclicks').value = bnclicks
 	}
 	if(localStorage['timercheck'] && localStorage['timercheck'] == 'true') {
 		show(getId('timerbox'))
