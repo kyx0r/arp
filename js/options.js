@@ -23,8 +23,6 @@ function save_options(){
 
 	localStorage['default_time'+preset] = getId('default_time').value;
 	localStorage['random_time'+preset] = getId('randomTime').checked
-	localStorage['autostart'+preset] = getId('autostart').checked;
-	localStorage['asurl'+preset] = getId('asurl').value;
 	localStorage['pdcheck'+preset] = getId('pdcheck').checked
 	localStorage['pdurl'+preset] = getId('pdurl').value;
 	localStorage['pselector'+preset] = getId('pselector').value;
@@ -88,13 +86,10 @@ function read_options(){
 	}
 
  	getId('randomTime').checked  = (localStorage['random_time'+preset] == 'true');
- 	getId('autostart').checked  = (localStorage['autostart'+preset] == 'true');
  	getId('pdcheck').checked  = (localStorage['pdcheck'+preset] == 'true');
  	getId('pmonitor').checked  = (localStorage['pmonitor'+preset] == 'true');
  	getId('timercheck').checked  = (localStorage['timercheck'+preset] == 'true');
  	getId('buttoncheck').checked  = (localStorage['buttoncheck'+preset] == 'true');
-
-	getId('asurl').value = localStorage['asurl'+preset] || '';
 
 	// timer
 	if(localStorage['timermode'+preset]) {

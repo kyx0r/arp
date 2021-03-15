@@ -141,7 +141,7 @@ function startRefresh() {
 	
 		for (var i in views) {
 			if (views[i].loop_start) {
-				views[i].loop_start(-1, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
+				views[i].loop_start(preset, -1, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
 							bquery, btext, bskip, btimeout, bnclicks);
 			}
 		}
@@ -192,7 +192,7 @@ function startTimer() {
 			var views = chrome.extension.getViews();
 			for (var i in views) {
 				if (views[i].loop_start) {
-					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
+					views[i].loop_start(preset, waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
 							bquery, btext, bskip, btimeout, bnclicks);
 				}
 			}
@@ -227,7 +227,7 @@ function startTimer() {
 			for (var i in views) {
 				var page_monitor_pattern = getId("pmpattern").value;
 				if (views[i].loop_start) {
-					views[i].loop_start(waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
+					views[i].loop_start(preset, waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
 							bquery, btext, bskip, btimeout, bnclicks);
 				}
 			}

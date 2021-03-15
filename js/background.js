@@ -1,6 +1,4 @@
 
-var preset = localStorage['preset'];
-
 function getCurrentTab(callback) {
     chrome.tabs.query(
         {  currentWindow: true, active: true, windowType:'normal' },
@@ -8,19 +6,7 @@ function getCurrentTab(callback) {
     );
 }
 
-if (typeof localStorage['soundvolume'+preset] == 'undefined')
-	localStorage['soundvolume'+preset] = 1;
-
-
 var tabs = new Array();
-var auto_start_url = localStorage['asurl'+preset];
-if (localStorage['autostart'+preset] == "true" && auto_start_url) {
-	var default_time = 5000;
-	if(localStorage['default_time'+preset]) {
-		default_time = localStorage['default_time'+preset] * 1000;
-	}
-	loop_start(-1, default_time, 'C', '', '', '', auto_start_url);
-}
 
 chrome.extension.onConnect.addListener(function(port) {
 	if (port.name === 'getOptions') {
@@ -39,7 +25,7 @@ chrome.extension.onConnect.addListener(function(port) {
 
 var cachetime = 0;
 
-function updateTab(tabId, theurl){
+function updateTab(tabId, preset, theurl){
 try {
 	if (localStorage['cachereloadinterv'+preset] > -1)
 	{
@@ -69,7 +55,7 @@ function get_rand_time(tmin, tmax) {
 	return rand_time;
 }
 
-function loop_start(waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
+function loop_start(preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
 			bquery, btext, bskip, btimeout, bnclicks) {
 
 	getCurrentTab( function(tab) {
@@ -82,6 +68,9 @@ function loop_start(waitTime, interval_time, interval_type, checkme, page_monito
 		}
 
 		tabs[currentTabId] = new Array();
+		tabs[currentTabId]['preset'] = preset;
+		if (typeof localStorage['soundvolume'+preset] == 'undefined')
+			localStorage['soundvolume'+preset] = 1;
 		if(predefined_url) {
 			tabs[currentTabId]['pre_url'] = predefined_url;
 			tabs[currentTabId]['action_url'] = predefined_url;
@@ -301,7 +290,7 @@ chrome.notifications.onClosed.addListener(function (id) {
 	delete onClickForNotifications[id];
 });
 
-function show_notification(tabId, pmpattern, check_content, onclick) {
+function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 	var action = (pmpattern == 'B') ? 'Lost' : 'Found';
 	var time = /(..):(..)/.exec(new Date);       // The prettyprinted time.
 	var hour = time[1] % 12 || 12;               // The prettyprinted hour.
@@ -382,9 +371,10 @@ function reload_it(tabId, tab_url) {
 		var bskip = tabs[tabId]['bskip'];
 		var btimeout = tabs[tabId]['btimeout'];
 		var bnclicks = tabs[tabId]['bnclicks'];
+		var preset = tabs[tabId]['preset'];
 
 		if(tabs[tabId]['count'] == 0) {
-			updateTab(tabId, tab_url);
+			updateTab(tabId, preset, tab_url);
 		} else {
 			chrome.tabs.sendMessage(tabId, 
 				{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
@@ -402,7 +392,7 @@ function reload_it(tabId, tab_url) {
 							chrome.tabs.update(tabId, {active: true});
 						}
 						// show notification box
-						show_notification(tabId, pmpattern, check_content, function () {
+						show_notification(tabId, preset, pmpattern, check_content, function () {
 							// switch to target tab & its window upon clicking the box
 							chrome.tabs.update(tabId, {active: true});
 							chrome.windows.update(tab.windowId, {focused: true});
@@ -411,13 +401,13 @@ function reload_it(tabId, tab_url) {
 				});
 			} else {
 				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-				updateTab(tabId, tab_url);
+				updateTab(tabId, preset, tab_url);
 			}
 			});
 		}
 	} else {
 		chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-		updateTab(tabId, tab_url);
+		updateTab(tabId, preset, tab_url);
 	}
 	tabs[tabId]['count']++;
 }
