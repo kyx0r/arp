@@ -3,7 +3,7 @@ LOGIN OR CREATE AN ACCOUNT
 queryselector = .button
 text = Login
 
-https://www.zotacstore.com/us/wishlist/index/index/
+https://www.zotacstore.com/us/wishlist
 ADD ALL
 queryselector = .button.btn-cart
 text = Add to Cart

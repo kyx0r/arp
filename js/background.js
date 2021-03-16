@@ -30,14 +30,14 @@ try {
 	if (localStorage['cachereloadinterv'+preset] > -1)
 	{
 		var t = new Date().getTime();
-		if (t > cachetime)
-		{
-			chrome.tabs.reload(tabId, {bypassCache: true});
-			cachetime = t + localStorage['cachereloadinterv'+preset] * 1000;
-		} else
-			chrome.tabs.update(tabId, {url: theurl});
-	} else
+		chrome.tabs.reload(tabId, {bypassCache: true});
 		chrome.tabs.update(tabId, {url: theurl});
+		if (t > cachetime)
+			cachetime = t + localStorage['cachereloadinterv'+preset] * 1000;
+	} else {
+		chrome.tabs.reload(tabId);
+		chrome.tabs.update(tabId, {url: theurl});
+	}
 } catch (e) {
 	alert(e);
 	}
@@ -77,6 +77,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		} else {
 			tabs[currentTabId]['action_url'] = tab.url;
 		}
+
 		if(bquery)
 		{
 			tabs[currentTabId]['bquery'] = bquery;

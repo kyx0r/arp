@@ -1,7 +1,9 @@
 
 var preset = 0;
+var pchange = 0;
 
 ready(() => {
+	pchange = 0;
 	if(localStorage['preset'])
 	{
 		preset = localStorage['preset'];
@@ -37,6 +39,7 @@ ready(() => {
 
 function changepreset(obj)
 {
+	pchange = 1;
 	preset = obj.target.value;
 	localStorage['preset'] = preset;
 	restoreOptions();
@@ -284,8 +287,10 @@ function restoreOptions() {
 		show(getId('pdurlbox'))
 		var pdurl = localStorage['pdurl'+preset];
 		getId('pdurlinp').value = pdurl
-	} else 
+	} else {
 		hide(getId('pdurlbox'))
+		getId('pdurlinp').value = ''
+	}
 	if(localStorage['buttoncheck'+preset] && localStorage['buttoncheck'+preset] == 'true'){
 		show(getId('buttonclick'))
 		var bquery = localStorage['pselector'+preset];
@@ -298,8 +303,14 @@ function restoreOptions() {
 		getId('bskip').value = bskip
 		getId('btimeout').value = btimeout
 		getId('bnclicks').value = bnclicks
-	} else
+	} else {
 		hide(getId('buttonclick'))
+		getId('bselector').value = ''
+		getId('btext').value = ''
+		getId('bskip').value = 0
+		getId('btimeout').value = 100 
+		getId('bnclicks').value = 1
+	}
 	if(localStorage['timercheck'+preset] && localStorage['timercheck'+preset] == 'true') {
 		show(getId('timerbox'))
 		if(localStorage['timermode'+preset] == "1") {
@@ -358,7 +369,7 @@ function recvData(data){
 		else if(data.pmpattern == 'B') 
 			getId('contentid1').value = data.checkme;
 	}
-	if (data.preset != localStorage['preset'])
+	if (data.preset != localStorage['preset'] && !pchange)
 	{
 		localStorage['preset'] = data.preset;
 		getId('ppresets').value = data.preset;
