@@ -358,6 +358,13 @@ function recvData(data){
 		else if(data.pmpattern == 'B') 
 			getId('contentid1').value = data.checkme;
 	}
+	if (data.preset != localStorage['preset'])
+	{
+		localStorage['preset'] = data.preset;
+		getId('ppresets').value = data.preset;
+		preset = data.preset;
+		restoreOptions();
+	}
 
 	if(data.wait_time) {
 		if(data.wait_time.toString().search(" ") == -1) {

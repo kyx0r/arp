@@ -66,6 +66,7 @@ chrome.extension.onMessage.addListener(
 	var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
+			//console.log(document.body.innerHTML);
 			clickbtn(request);
 			sendResponse({findresult: "yes"});
 		} else {

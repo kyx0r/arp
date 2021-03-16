@@ -15,7 +15,7 @@ chrome.extension.onConnect.addListener(function(port) {
 				getCurrentTab( function(tab) {
 					var tabIsReloaderActive = tabs[tab.id] || false;
 					if (tabIsReloaderActive) {
-						port.postMessage({status:tabs[tab.id].status, time_interval:tabs[tab.id].interval_time, time_type:tabs[tab.id].time_type, checkme:tabs[tab.id].checkme, pmpattern:tabs[tab.id].pmpattern, wait_time:tabs[tab.id].wait_time});
+						port.postMessage({status:tabs[tab.id].status, time_interval:tabs[tab.id].interval_time, time_type:tabs[tab.id].time_type, checkme:tabs[tab.id].checkme, pmpattern:tabs[tab.id].pmpattern, wait_time:tabs[tab.id].wait_time, preset:tabs[tab.id].preset});
 					}
 				});
 			}
