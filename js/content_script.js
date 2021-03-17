@@ -66,16 +66,16 @@ chrome.extension.onMessage.addListener(
   	if(request.pipattern)
   	{
 		var regex = new RegExp(request.pipattern, "i");
+		//console.log(document.body.innerHTML);
 		if (regex.test(document.body.innerHTML))
 		{
-			sendResponse({});
+			sendResponse({findresult: "skip"});
 			return;
 		}
   	}
 	var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
-			//console.log(document.body.innerHTML);
 			clickbtn(request);
 			sendResponse({findresult: "yes"});
 		} else {

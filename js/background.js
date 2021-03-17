@@ -382,7 +382,9 @@ function reload_it(tabId, tab_url) {
 				{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
 				timeout: btimeout, clicks: bnclicks, pipattern: ipattern},
 				function(response) {
-			if (!chrome.runtime.lastError && response.findresult == "yes") {
+			if (chrome.runtime.lastError)
+				return;
+			if (response.findresult == "yes") {
 				// notification & tab handling
 				reload_cancel(tabId, 'yes');
 				chrome.tabs.get(tabId, function (tab) {
@@ -401,7 +403,7 @@ function reload_it(tabId, tab_url) {
 						});
 					});
 				});
-			} else {
+			} else if (response.findresult != "skip") {
 				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 				updateTab(tabId, preset, tab_url);
 			}
