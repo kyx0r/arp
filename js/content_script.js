@@ -63,6 +63,15 @@ function clickbtn(request)
 
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
+  	if(request.pipattern)
+  	{
+		var regex = new RegExp(request.pipattern, "i");
+		if (regex.test(document.body.innerHTML))
+		{
+			sendResponse({});
+			return;
+		}
+  	}
 	var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {

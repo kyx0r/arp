@@ -373,13 +373,14 @@ function reload_it(tabId, tab_url) {
 		var btimeout = tabs[tabId]['btimeout'];
 		var bnclicks = tabs[tabId]['bnclicks'];
 		var preset = tabs[tabId]['preset'];
+		var ipattern = localStorage['ipattern'+preset];
 
 		if(tabs[tabId]['count'] == 0) {
 			updateTab(tabId, preset, tab_url);
 		} else {
 			chrome.tabs.sendMessage(tabId, 
 				{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
-				timeout: btimeout, clicks: bnclicks},
+				timeout: btimeout, clicks: bnclicks, pipattern: ipattern},
 				function(response) {
 			if (!chrome.runtime.lastError && response.findresult == "yes") {
 				// notification & tab handling
