@@ -15,5 +15,7 @@ queryselector = .ppvx_btn___5-7-4
 timeout = 100
 nclicks = 50
 
+queryselector2 = .btn.full.confirmButton.continueButton
+
 
 Checking your browser
