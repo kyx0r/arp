@@ -399,31 +399,33 @@ function reload_it(tabId, tab_url) {
 				{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
 				timeout: btimeout, clicks: bnclicks, pipattern: ipattern},
 				function(response) {
-			if (!chrome.runtime.lastError)
+			if (chrome.runtime.lastError)
 			{
-				if (response.findresult == "yes") {
-					// notification & tab handling
-					reload_cancel(tabId, 'yes');
-					chrome.tabs.get(tabId, function (tab) {
-						chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
-							// draw attention to target window if it's not focused inside Chrome
-							// (or not focused at all) and switch to the target tab
-							if (lastFocusedWindow.id != tab.windowId || !lastFocusedWindow.focused) {
-								chrome.windows.update(tab.windowId, {drawAttention: true});
-								chrome.tabs.update(tabId, {active: true});
-							}
-							// show notification box
-							show_notification(tabId, preset, pmpattern, check_content, function () {
-								// switch to target tab & its window upon clicking the box
-								chrome.tabs.update(tabId, {active: true});
-								chrome.windows.update(tab.windowId, {focused: true});
-							});
+				updateTab(tabId, preset, tab_url);
+				return;
+			}
+			if (response.findresult == "yes") {
+				// notification & tab handling
+				reload_cancel(tabId, 'yes');
+				chrome.tabs.get(tabId, function (tab) {
+					chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
+						// draw attention to target window if it's not focused inside Chrome
+						// (or not focused at all) and switch to the target tab
+						if (lastFocusedWindow.id != tab.windowId || !lastFocusedWindow.focused) {
+							chrome.windows.update(tab.windowId, {drawAttention: true});
+							chrome.tabs.update(tabId, {active: true});
+						}
+						// show notification box
+						show_notification(tabId, preset, pmpattern, check_content, function () {
+							// switch to target tab & its window upon clicking the box
+							chrome.tabs.update(tabId, {active: true});
+							chrome.windows.update(tab.windowId, {focused: true});
 						});
 					});
-				} else if (response.findresult != "skip") {
-					chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-					updateTab(tabId, preset, tab_url);
-				}
+				});
+			} else if (response.findresult != "skip") {
+				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
+				updateTab(tabId, preset, tab_url);
 			}
 			});
 		}
