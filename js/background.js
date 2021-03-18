@@ -30,10 +30,14 @@ try {
 	if (localStorage['cachereloadinterv'+preset] > -1)
 	{
 		var t = new Date().getTime();
-		chrome.tabs.reload(tabId, {bypassCache: true});
-		chrome.tabs.update(tabId, {url: theurl});
 		if (t > cachetime)
+		{
+			chrome.tabs.reload(tabId, {bypassCache: true});
 			cachetime = t + localStorage['cachereloadinterv'+preset] * 1000;
+		} else {
+			chrome.tabs.reload(tabId);
+			chrome.tabs.update(tabId, {url: theurl});
+		}
 	} else {
 		chrome.tabs.reload(tabId);
 		chrome.tabs.update(tabId, {url: theurl});
