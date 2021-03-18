@@ -383,7 +383,10 @@ function reload_it(tabId, tab_url) {
 				timeout: btimeout, clicks: bnclicks, pipattern: ipattern},
 				function(response) {
 			if (chrome.runtime.lastError)
+			{
+				updateTab(tabId, preset, tab_url);
 				return;
+			}
 			if (response.findresult == "yes") {
 				// notification & tab handling
 				reload_cancel(tabId, 'yes');
