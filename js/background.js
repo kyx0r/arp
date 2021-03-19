@@ -24,6 +24,7 @@ chrome.extension.onConnect.addListener(function(port) {
 });
 
 var cachetime = 0;
+var urlChanged = true;
 
 function updateTab(tabId, preset, theurl){
 try {
@@ -34,13 +35,14 @@ try {
 		{
 			chrome.tabs.reload(tabId, {bypassCache: true});
 			cachetime = t + localStorage['cachereloadinterv'+preset] * 1000;
-		} else {
+		} else
 			chrome.tabs.reload(tabId);
-			chrome.tabs.update(tabId, {url: theurl});
-		}
-	} else {
+	} else
 		chrome.tabs.reload(tabId);
+	if (urlChanged)
+	{
 		chrome.tabs.update(tabId, {url: theurl});
+		urlChanged = false;
 	}
 } catch (e) {
 	alert(e);
@@ -158,7 +160,7 @@ function onUpdateListener(tabId, changeInfo, tab) {
 	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
 	if (tabIsReloaderActive) {
 		if (changeInfo['status'] === 'loading') {
-			var urlChanged=changeInfo['url'] || false;
+			urlChanged=changeInfo['url'] || false;
 			if(tabs[tabId]['pre_url']) {
 				tabs[tabId]['action_url'] = tabs[tabId]['pre_url'];
 			} else if (urlChanged) {
