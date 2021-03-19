@@ -24,7 +24,6 @@ chrome.extension.onConnect.addListener(function(port) {
 });
 
 var cachetime = 0;
-var urlChanged = true;
 
 function updateTab(tabId, preset, theurl){
 try {
@@ -39,10 +38,10 @@ try {
 			chrome.tabs.reload(tabId);
 	} else
 		chrome.tabs.reload(tabId);
-	if (urlChanged)
+	if (tabs[tabId]['urlChanged'])
 	{
 		chrome.tabs.update(tabId, {url: theurl});
-		urlChanged = false;
+		tabs[tabId]['urlChanged'] = false;
 	}
 } catch (e) {
 	alert(e);
@@ -76,6 +75,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 
 		tabs[currentTabId] = new Array();
 		tabs[currentTabId]['preset'] = preset;
+		tabs[currentTabId]['urlChanged'] = true;
 		if (typeof localStorage['soundvolume'+preset] == 'undefined')
 			localStorage['soundvolume'+preset] = 1;
 		if(predefined_url) {
@@ -161,6 +161,7 @@ function onUpdateListener(tabId, changeInfo, tab) {
 	if (tabIsReloaderActive) {
 		if (changeInfo['status'] === 'loading') {
 			urlChanged=changeInfo['url'] || false;
+			tabs[tabId]['urlChanged'] = urlChanged;
 			if(tabs[tabId]['pre_url']) {
 				tabs[tabId]['action_url'] = tabs[tabId]['pre_url'];
 			} else if (urlChanged) {
