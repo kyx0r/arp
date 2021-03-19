@@ -161,12 +161,14 @@ function onUpdateListener(tabId, changeInfo, tab) {
 	if (tabIsReloaderActive) {
 		if (changeInfo['status'] === 'loading') {
 			urlChanged=changeInfo['url'] || false;
-			tabs[tabId]['urlChanged'] = urlChanged;
 			if(tabs[tabId]['pre_url']) {
 				tabs[tabId]['action_url'] = tabs[tabId]['pre_url'];
 			} else if (urlChanged) {
 				tabs[tabId]['action_url'] = urlChanged;
 			}
+			if (tab.url.localeCompare(tabs[tabId]['action_url']))
+				urlChanged = true;
+			tabs[tabId]['urlChanged'] = urlChanged;
 		} else if (changeInfo['status'] === 'complete') {
 			if(tabs[tabId]['time_type'] == 'rand') {
 				var min_max_arr = tabs[tabId]['interval_time'].split("-");
