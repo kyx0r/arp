@@ -183,6 +183,8 @@ function onUpdateListener(tabId, changeInfo, tab) {
 				var interval_time_tmp = get_rand_time(min_max_arr[0], min_max_arr[1]);
 				tabs[tabId]['time_between_load'] = interval_time_tmp * 1000;
 			}
+			if (tabs[tabId].ltimeout)
+				clearTimeout(tabs[tabId].ltimeout);
 			tabs[tabId].next_round = tabs[tabId].time_between_load/1000;
 			setTheBadgeText(tabId);
 			setupReloadTimer(tabId);
@@ -439,9 +441,6 @@ function reload_it(tabId, tab_url) {
 			} else if (response.findresult != "skip") {
 				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 				updateTab(tabId, preset, tab_url);
-			} else {
-				if (tabs[tabId].ltimeout)
-					clearTimeout(tabs[tabId].ltimeout);
 			}
 			});
 		}
