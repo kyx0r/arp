@@ -27,6 +27,13 @@ var cachetime = 0;
 
 function updateTab(tabId, preset, theurl){
 try {
+	var timeout = localStorage['loadtimeout'+preset];
+	if (timeout > 0)
+	{
+		if (tabs[tabId].ltimeout)
+			clearTimeout(tabs[tabId].ltimeout);
+		tabs[tabId].ltimeout = setTimeout(updateTab, timeout, tabId, preset, theurl);
+	}
 	if (localStorage['cachereloadinterv'+preset] > -1)
 	{
 		var t = new Date().getTime();
@@ -38,10 +45,10 @@ try {
 			chrome.tabs.reload(tabId);
 	} else
 		chrome.tabs.reload(tabId);
-	if (tabs[tabId]['urlChanged'])
+	if (tabs[tabId].urlChanged)
 	{
 		chrome.tabs.update(tabId, {url: theurl});
-		tabs[tabId]['urlChanged'] = false;
+		tabs[tabId].urlChanged = false;
 	}
 } catch (e) {
 	alert(e);
@@ -75,7 +82,8 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 
 		tabs[currentTabId] = new Array();
 		tabs[currentTabId]['preset'] = preset;
-		tabs[currentTabId]['urlChanged'] = true;
+		tabs[currentTabId].urlChanged = true;
+		tabs[currentTabId].ltimeout = null;
 		if (typeof localStorage['soundvolume'+preset] == 'undefined')
 			localStorage['soundvolume'+preset] = 1;
 		if(predefined_url) {
@@ -168,7 +176,7 @@ function onUpdateListener(tabId, changeInfo, tab) {
 			}
 			if (tab.url.localeCompare(tabs[tabId]['action_url']))
 				urlChanged = true;
-			tabs[tabId]['urlChanged'] = urlChanged;
+			tabs[tabId].urlChanged = urlChanged;
 		} else if (changeInfo['status'] === 'complete') {
 			if(tabs[tabId]['time_type'] == 'rand') {
 				var min_max_arr = tabs[tabId]['interval_time'].split("-");
@@ -210,7 +218,7 @@ function setupReloadTimer(tabId) {
 }
 
 function stopBadgeTimer(tabId) {
-	if (tabs[tabId].displayTimer || false) {
+	if (tabs[tabId].displayTimer) {
 		clearTimeout(tabs[tabId].displayTimer);
 		tabs[tabId].displayTimer = null;
 	}
@@ -431,6 +439,9 @@ function reload_it(tabId, tab_url) {
 			} else if (response.findresult != "skip") {
 				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 				updateTab(tabId, preset, tab_url);
+			} else {
+				if (tabs[tabId].ltimeout)
+					clearTimeout(tabs[tabId].ltimeout);
 			}
 			});
 		}
@@ -443,13 +454,15 @@ function reload_it(tabId, tab_url) {
 
 function reload_cancel(tabId, content_detect) {
 
-   if (tabs[tabId].reloadTimer) {
-            clearTimeout(tabs[tabId].reloadTimer);
-            tabs[tabId].reloadTimer = null;
-   }
-	if (tabs[tabId].displayTimer) {
-		clearTimeout(tabs[tabId].displayTimer);
-		tabs[tabId].displayTimer = null;
+	if (tabs[tabId].reloadTimer) {
+		clearTimeout(tabs[tabId].reloadTimer);
+		tabs[tabId].reloadTimer = null;
+	}
+	stopBadgeTimer(tabId);
+	if (tabs[tabId].ltimeout)
+	{
+		clearTimeout(tabs[tabId].ltimeout);
+		tabs[tabId].ltimeout = null;
 	}
 	tabs[tabId].status = 'stop';
 	tabs[tabId].next_round = 0;

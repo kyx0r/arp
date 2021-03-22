@@ -75,6 +75,7 @@ function save_options(){
 	localStorage['pm_sound_timeout'+preset]  = getId('pm_sound_timeout').value;
 
 	localStorage['cachereloadinterv'+preset] = getId('cachereloadinterv').value;
+	localStorage['loadtimeout'+preset] = getId('loadtimeout').value;
 
 	localStorage.support = !(getId('dontsupport').checked);
 
@@ -140,6 +141,7 @@ function read_options(){
 	getId('pm_sound_til_' + localStorage['pm_sound_til'+preset]).checked = true;
 	getId('pm_sound_timeout').value = localStorage['pm_sound_timeout'+preset] || 5;
 	getId('cachereloadinterv').value = localStorage['cachereloadinterv'+preset] || -1;
+	getId('loadtimeout').value = localStorage['loadtimeout'+preset] || 0;
 
 	getId('dontsupport').checked = (localStorage.support == 'false');
 }
