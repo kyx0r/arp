@@ -184,7 +184,10 @@ function onUpdateListener(tabId, changeInfo, tab) {
 				tabs[tabId]['time_between_load'] = interval_time_tmp * 1000;
 			}
 			if (tabs[tabId].ltimeout)
+			{
 				clearTimeout(tabs[tabId].ltimeout);
+				tabs[tabId].ltimeout = null;
+			}
 			tabs[tabId].next_round = tabs[tabId].time_between_load/1000;
 			setTheBadgeText(tabId);
 			setupReloadTimer(tabId);
