@@ -130,11 +130,11 @@ function startRefresh() {
 		var myInterval = get_interval();
 		var views = chrome.extension.getViews();
 		var checkme = getId("contentid").value;
-		var page_monitor_pattern = getId("pmpattern").value;
+		var page_monitor_pattern = 'A';
 		if (!checkme)
 		{
 			checkme = getId("contentid1").value;
-			page_monitor_pattern = getId("pmpattern1").value;
+			page_monitor_pattern = 'B';
 		}
 		var preurl = getId("pdurlinp").value;
 		var bquery = getId('bselector').value;
@@ -165,11 +165,11 @@ function startTimer() {
   if (getId("timerbtn").value == "Start Timer" ) {
 	var myInterval = get_interval();
 	var checkme = getId("contentid").value;
-	var page_monitor_pattern = getId("pmpattern").value;
+	var page_monitor_pattern = 'A';
 	if (!checkme)
 	{
 		checkme = getId("contentid1").value;
-		page_monitor_pattern = getId("pmpattern1").value;
+		page_monitor_pattern = 'B';
 	}
 	var preurl = getId("pdurlinp").value;
 	var bquery = getId('bselector').value;
@@ -229,7 +229,6 @@ function startTimer() {
 			var waitTime = dDate+" "+dTime;
 			var views = chrome.extension.getViews();
 			for (var i in views) {
-				var page_monitor_pattern = getId("pmpattern").value;
 				if (views[i].loop_start) {
 					views[i].loop_start(preset, waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
 							bquery, btext, bskip, btimeout, bnclicks);
@@ -272,16 +271,6 @@ function restoreOptions() {
 			show(getId('default-value-button1'))
 		} else
 			hide(getId('default-value-button1'))
-		if(localStorage['pmpattern'+preset] && localStorage['pmpattern'+preset] == 'B') {
-			show(getId('pagemr02'))
-			hide(getId('pagemr01'))
-			getId('pmpattern').value = 'B'
-		} else {
-			hide(getId('pagemr02'))
-			show(getId('pagemr01'))
-			getId('pmpattern').value = 'A'
-		}
-		show(getId('pagemr03'))
 	} else 
 		hide(getId('monitorbox'))
 	if(localStorage['pdcheck'+preset] && localStorage['pdcheck'+preset] == 'true'){

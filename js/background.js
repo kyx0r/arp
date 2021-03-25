@@ -165,18 +165,22 @@ function next_preset(tabId, preset)
 {
 	if (localStorage['random_time'+preset] == 'true')
 		tabs[tabId].time_type = 'rand';
+		//todo: make defaults for random values
 	else
 		tabs[tabId].time_between_load = localStorage['default_time'+preset];
 
-	if (localStorage['pdcheck'+preset] == 'true') 
-	{
+	if (localStorage['pdcheck'+preset] == 'true') {
 		tabs[tabId].predefined_url = localStorage['pdurl'+preset];
 		tabs[tabId].action_url = localStorage['pdurl'+preset];
 	}
-	if (localStorage['dpattern'+preset])
+	if (localStorage['dpattern'+preset]) {
 		tabs[tabId].checkme = localStorage['dpattern'+preset];
-	if (localStorage['dpattern1'+preset])
+		tabs[tabId].pmpattern = 'A';
+	}
+	else if (localStorage['dpattern1'+preset]) {
 		tabs[tabId].checkme = localStorage['dpattern1'+preset];
+		tabs[tabId].pmpattern = 'B';
+	}
 	loop_start(preset, -1, tabs[tabId].time_between_load, tabs[tabId].time_type,
 				tabs[tabId].checkme, tabs[tabId].pmpattern, tabs[tabId].predefined_url,
 				localStorage['pselector'+preset], localStorage['ptext'+preset],
@@ -437,8 +441,6 @@ function reload_it(tabId, tab_url) {
 		var bnclicks = tabs[tabId].bnclicks;
 		var preset = tabs[tabId].preset;
 		var ipattern = localStorage['ipattern'+preset];
-		console.log(check_content);
-		console.log(pmpattern);
 		chrome.tabs.sendMessage(tabId, 
 			{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
 			timeout: btimeout, clicks: bnclicks, pipattern: ipattern},

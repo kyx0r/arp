@@ -45,12 +45,6 @@ function save_options(){
 
 	localStorage['pmonitor'+preset] = getId('pmonitor').checked
 
-	if(getId('pagemr01').checked) {
-		localStorage['pmpattern'+preset] = 'A';
-	} else {
-		localStorage['pmpattern'+preset] = 'B';
-	}
-
 	if(getId('pmsound01').checked) {
 		localStorage['sound'+preset] = '1';
 	} else if(getId('pmsound02').checked) {
@@ -102,11 +96,6 @@ function read_options(){
 		}
 	} else {
 		getId('timer01').checked = true;
-	}
-	if(localStorage['pmpattern'+preset] && localStorage['pmpattern'+preset] == 'B') {
-		getId('pagemr02').checked = true;
-	} else {
-		getId('pagemr01').checked = true;
 	}
 
 	getId('defaultPattern').value = localStorage['dpattern'+preset] || '';
