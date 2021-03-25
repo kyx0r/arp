@@ -3,6 +3,7 @@ var preset = 0;
 var pchange = 0;
 
 ready(() => {
+	console = chrome.extension.getBackgroundPage().console;
 	pchange = 0;
 	if(localStorage['preset'])
 	{
