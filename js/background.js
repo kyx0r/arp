@@ -126,7 +126,6 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 			tabs[currentTabId].pmpattern = page_monitor_pattern;
 		}
 
-		tabs[currentTabId].count = 0;
 		var the_action_url = tabs[currentTabId].action_url;
 		if(waitTime == -1) {
 			tabs[currentTabId].status = 'start';
@@ -162,37 +161,28 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 	});
 }
 
-/*
 function next_preset(tabId, preset)
 {
-	tabs[tabId].preset = preset;
-	if (localStorage['random_time'+preset])
-	{
-
-	} else
+	if (localStorage['random_time'+preset] == 'true')
+		tabs[tabId].time_type = 'rand';
+	else
 		tabs[tabId].time_between_load = localStorage['default_time'+preset];
-	if (localStorage['pdcheck'+preset]) 
+
+	if (localStorage['pdcheck'+preset] == 'true') 
 	{
 		tabs[tabId].predefined_url = localStorage['pdurl'+preset];
 		tabs[tabId].action_url = localStorage['pdurl'+preset];
-	} else
-		tabs[tabId]['action_url'] = tab.url;
-	if(localStorage['buttoncheck'+preset])
-	{
-		tabs[tabId].bquery = localStorage['pselector'+preset];
-		tabs[tabId].btext = localStorage['ptext'+preset];
-		tabs[tabId].bskip = localStorage['pskip'+preset];
-		tabs[tabId].btimeout = localStorage['ptimeout'+preset];
-		tabs[tabId].bnclicks = localStorage['pnclicks'+preset];
 	}
-	//localStorage['timercheck'+preset] = getId('timercheck').checked;
-	localStorage['dpattern'+preset] = getId('defaultPattern').value;
-	localStorage['dpattern1'+preset] = getId('defaultPattern1').value;
-
-	if (typeof localStorage['soundvolume'+preset] == 'undefined')
-		localStorage['soundvolume'+preset] = 1;
+	if (localStorage['dpattern'+preset])
+		tabs[tabId].checkme = localStorage['dpattern'+preset];
+	if (localStorage['dpattern1'+preset])
+		tabs[tabId].checkme = localStorage['dpattern1'+preset];
+	loop_start(preset, -1, tabs[tabId].time_between_load, tabs[tabId].time_type,
+				tabs[tabId].checkme, tabs[tabId].pmpattern, tabs[tabId].predefined_url,
+				localStorage['pselector'+preset], localStorage['ptext'+preset],
+				localStorage['pskip'+preset], localStorage['ptimeout'+preset],
+				localStorage['pnclicks'+preset]);
 }
-*/
 
 function loop_stop() {
 	getCurrentTab( function(tab) {
@@ -234,12 +224,12 @@ function onUpdateListener(tabId, changeInfo, tab) {
 					tabs[tabId].next_round--;
 					setTheBadgeText(tabId);
 				}, 1000, tabId);
+			//next_preset(tabId, "1");
 		}
-	}
+	} 
 }
 
 function onRemoveListener(tabId, removeInfo) {
-	console.log(tabId);
 	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
 	if (tabIsReloaderActive)
 	{
@@ -447,45 +437,41 @@ function reload_it(tabId, tab_url) {
 		var bnclicks = tabs[tabId].bnclicks;
 		var preset = tabs[tabId].preset;
 		var ipattern = localStorage['ipattern'+preset];
-
-		if(tabs[tabId].count == 0) {
+		console.log(check_content);
+		console.log(pmpattern);
+		chrome.tabs.sendMessage(tabId, 
+			{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
+			timeout: btimeout, clicks: bnclicks, pipattern: ipattern},
+			function(response) {
+		if (chrome.runtime.lastError)
+		{
 			updateTab(tabId, preset, tab_url);
-			tabs[tabId].count++;
-		} else {
-			chrome.tabs.sendMessage(tabId, 
-				{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
-				timeout: btimeout, clicks: bnclicks, pipattern: ipattern},
-				function(response) {
-			if (chrome.runtime.lastError)
-			{
-				updateTab(tabId, preset, tab_url);
-				return;
-			}
-			if (response.findresult == "yes") {
-				// notification & tab handling
-				reload_cancel(tabId, 'yes');
-				chrome.tabs.get(tabId, function (tab) {
-					chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
-						// draw attention to target window if it's not focused inside Chrome
-						// (or not focused at all) and switch to the target tab
-						if (lastFocusedWindow.id != tab.windowId || !lastFocusedWindow.focused) {
-							chrome.windows.update(tab.windowId, {drawAttention: true});
-							chrome.tabs.update(tabId, {active: true});
-						}
-						// show notification box
-						show_notification(tabId, preset, pmpattern, check_content, function () {
-							// switch to target tab & its window upon clicking the box
-							chrome.tabs.update(tabId, {active: true});
-							chrome.windows.update(tab.windowId, {focused: true});
-						});
+			return;
+		}
+		if (response.findresult == "yes") {
+			// notification & tab handling
+			reload_cancel(tabId, 'yes');
+			chrome.tabs.get(tabId, function (tab) {
+				chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
+					// draw attention to target window if it's not focused inside Chrome
+					// (or not focused at all) and switch to the target tab
+					if (lastFocusedWindow.id != tab.windowId || !lastFocusedWindow.focused) {
+						chrome.windows.update(tab.windowId, {drawAttention: true});
+						chrome.tabs.update(tabId, {active: true});
+					}
+					// show notification box
+					show_notification(tabId, preset, pmpattern, check_content, function () {
+						// switch to target tab & its window upon clicking the box
+						chrome.tabs.update(tabId, {active: true});
+						chrome.windows.update(tab.windowId, {focused: true});
 					});
 				});
-			} else if (response.findresult != "skip") {
-				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-				updateTab(tabId, preset, tab_url);
-			}
 			});
+		} else if (response.findresult != "skip") {
+			chrome.browserAction.setBadgeText({text:'', tabId:tabId});
+			updateTab(tabId, preset, tab_url);
 		}
+		});
 	} else {
 		chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 		updateTab(tabId, preset, tab_url);
