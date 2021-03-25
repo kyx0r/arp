@@ -90,6 +90,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].preset = preset;
 		tabs[currentTabId].urlChanged = true;
 		tabs[currentTabId].ltimeout = null;
+		//tabs[currentTabId].yes = false;
 		if (typeof localStorage['soundvolume'+preset] == 'undefined')
 			localStorage['soundvolume'+preset] = 1;
 		if(predefined_url) {
@@ -228,7 +229,6 @@ function onUpdateListener(tabId, changeInfo, tab) {
 					tabs[tabId].next_round--;
 					setTheBadgeText(tabId);
 				}, 1000, tabId);
-			//next_preset(tabId, "1");
 		}
 	} 
 }
@@ -433,6 +433,13 @@ function pause_sound_with_fadeout(sound) {
 function reload_it(tabId, tab_url) {
 	var check_content = tabs[tabId].checkme;
 	if(check_content) {
+		/*
+		if (tabs[tabId].yes)
+		{
+			next_preset(tabId, "1");
+			return;
+		}
+		*/
 		var pmpattern = tabs[tabId].pmpattern;
 		var bquery = tabs[tabId].bquery;
 		var btext = tabs[tabId].btext;
@@ -452,6 +459,7 @@ function reload_it(tabId, tab_url) {
 		}
 		if (response.findresult == "yes") {
 			// notification & tab handling
+			//tabs[tabId].yes = true;
 			reload_cancel(tabId, 'yes');
 			chrome.tabs.get(tabId, function (tab) {
 				chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
