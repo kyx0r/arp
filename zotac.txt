@@ -1,4 +1,4 @@
-https://www.zotacstore.com/us/customer/account/index/
+https://www.zotacstore.com/us/customer/account/loginPost/
 LOGIN OR CREATE AN ACCOUNT
 queryselector = .button
 text = Login
