@@ -90,7 +90,9 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].preset = preset;
 		tabs[currentTabId].urlChanged = true;
 		tabs[currentTabId].ltimeout = null;
-		//tabs[currentTabId].yes = false;
+		tabs[currentTabId].yes = false;
+		tabs[currentTabId].count = 0;
+		tabs[currentTabId].endpreset = null;
 		if (typeof localStorage['soundvolume'+preset] == 'undefined')
 			localStorage['soundvolume'+preset] = 1;
 		if(predefined_url) {
@@ -182,11 +184,15 @@ function next_preset(tabId, preset)
 		tabs[tabId].checkme = localStorage['dpattern1'+preset];
 		tabs[tabId].pmpattern = 'B';
 	}
+	var endpreset = tabs[tabId].endpreset;
+	var count = tabs[tabId].count;
 	loop_start(preset, -1, tabs[tabId].time_between_load, tabs[tabId].time_type,
 				tabs[tabId].checkme, tabs[tabId].pmpattern, tabs[tabId].predefined_url,
 				localStorage['pselector'+preset], localStorage['ptext'+preset],
 				localStorage['pskip'+preset], localStorage['ptimeout'+preset],
 				localStorage['pnclicks'+preset]);
+	tabs[tabId].endpreset = endpreset;
+	tabs[tabId].count = count;
 }
 
 function loop_stop() {
@@ -433,20 +439,25 @@ function pause_sound_with_fadeout(sound) {
 function reload_it(tabId, tab_url) {
 	var check_content = tabs[tabId].checkme;
 	if(check_content) {
-		/*
+		var preset = tabs[tabId].preset;
 		if (tabs[tabId].yes)
 		{
-			next_preset(tabId, "1");
+			var npreset = localStorage['npreset'+preset];
+			if (!tabs[tabId].endpreset && npreset)
+				tabs[tabId].endpreset = npreset.split(',');
+			if (tabs[tabId].endpreset && tabs[tabId].endpreset.length != tabs[tabId].count)
+				next_preset(tabId, tabs[tabId].endpreset[tabs[tabId].count]);
+			else
+				reload_cancel(tabId, 'yes');
+			tabs[tabId].count++;
 			return;
 		}
-		*/
 		var pmpattern = tabs[tabId].pmpattern;
 		var bquery = tabs[tabId].bquery;
 		var btext = tabs[tabId].btext;
 		var bskip = tabs[tabId].bskip;
 		var btimeout = tabs[tabId].btimeout;
 		var bnclicks = tabs[tabId].bnclicks;
-		var preset = tabs[tabId].preset;
 		var ipattern = localStorage['ipattern'+preset];
 		chrome.tabs.sendMessage(tabId, 
 			{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
@@ -459,8 +470,7 @@ function reload_it(tabId, tab_url) {
 		}
 		if (response.findresult == "yes") {
 			// notification & tab handling
-			//tabs[tabId].yes = true;
-			reload_cancel(tabId, 'yes');
+			tabs[tabId].yes = true;
 			chrome.tabs.get(tabId, function (tab) {
 				chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
 					// draw attention to target window if it's not focused inside Chrome
