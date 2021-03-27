@@ -93,6 +93,10 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].yes = false;
 		tabs[currentTabId].count = 0;
 		tabs[currentTabId].endpreset = null;
+		var npreset = localStorage['npreset'+preset];
+		if (npreset)
+			tabs[currentTabId].endpreset = npreset.split(',');
+
 		if (typeof localStorage['soundvolume'+preset] == 'undefined')
 			localStorage['soundvolume'+preset] = 1;
 		if(predefined_url) {
@@ -166,11 +170,20 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 
 function next_preset(tabId, preset)
 {
+	tabs[tabId].yes = false;
+	tabs[tabId].preset = preset;
 	if (localStorage['random_time'+preset] == 'true')
 		tabs[tabId].time_type = 'rand';
 		//todo: make defaults for random values
-	else
-		tabs[tabId].time_between_load = localStorage['default_time'+preset];
+	else {
+		var interval_time = localStorage['default_time'+preset] * 1000;
+		tabs[tabId].interval_time = interval_time;
+		if (interval_time == 0)
+			interval_time = 1;
+		tabs[tabId].time_between_load = interval_time;
+	}
+	console.log(tabs[tabId].interval_time);
+	console.log(tabs[tabId].time_between_load);
 
 	if (localStorage['pdcheck'+preset] == 'true') {
 		tabs[tabId].predefined_url = localStorage['pdurl'+preset];
@@ -179,20 +192,21 @@ function next_preset(tabId, preset)
 	if (localStorage['dpattern'+preset]) {
 		tabs[tabId].checkme = localStorage['dpattern'+preset];
 		tabs[tabId].pmpattern = 'A';
-	}
-	else if (localStorage['dpattern1'+preset]) {
+	} else if (localStorage['dpattern1'+preset]) {
 		tabs[tabId].checkme = localStorage['dpattern1'+preset];
 		tabs[tabId].pmpattern = 'B';
 	}
-	var endpreset = tabs[tabId].endpreset;
-	var count = tabs[tabId].count;
-	loop_start(preset, -1, tabs[tabId].time_between_load, tabs[tabId].time_type,
-				tabs[tabId].checkme, tabs[tabId].pmpattern, tabs[tabId].predefined_url,
-				localStorage['pselector'+preset], localStorage['ptext'+preset],
-				localStorage['pskip'+preset], localStorage['ptimeout'+preset],
-				localStorage['pnclicks'+preset]);
-	tabs[tabId].endpreset = endpreset;
-	tabs[tabId].count = count;
+	if (localStorage['pselector'+preset])
+	{
+		tabs[tabId].bquery = localStorage['pselector'+preset];
+		tabs[tabId].btext = localStorage['ptext'+preset];
+		tabs[tabId].bskip = localStorage['pskip'+preset];
+		tabs[tabId].btimeout = localStorage['ptimeout'+preset];
+		tabs[tabId].bnclicks = localStorage['pnclicks'+preset];
+	}
+	tabs[tabId].wait_time = 0;
+	tabs[tabId].wait_next_round = 0;
+	real_start(tabId, tabs[tabId].action_url); 
 }
 
 function loop_stop() {
@@ -442,14 +456,14 @@ function reload_it(tabId, tab_url) {
 		var preset = tabs[tabId].preset;
 		if (tabs[tabId].yes)
 		{
-			var npreset = localStorage['npreset'+preset];
-			if (!tabs[tabId].endpreset && npreset)
-				tabs[tabId].endpreset = npreset.split(',');
-			if (tabs[tabId].endpreset && tabs[tabId].endpreset.length != tabs[tabId].count)
+			if (tabs[tabId].endpreset && tabs[tabId].endpreset.length > tabs[tabId].count)
+			{
 				next_preset(tabId, tabs[tabId].endpreset[tabs[tabId].count]);
+				tabs[tabId].count++;
+				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
+			}
 			else
 				reload_cancel(tabId, 'yes');
-			tabs[tabId].count++;
 			return;
 		}
 		var pmpattern = tabs[tabId].pmpattern;
@@ -471,6 +485,8 @@ function reload_it(tabId, tab_url) {
 		if (response.findresult == "yes") {
 			// notification & tab handling
 			tabs[tabId].yes = true;
+			if (localStorage['onetimecheck'+preset] == 'true')
+				reload_cancel(tabId, 'yes');
 			chrome.tabs.get(tabId, function (tab) {
 				chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
 					// draw attention to target window if it's not focused inside Chrome

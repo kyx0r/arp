@@ -46,8 +46,9 @@ function clickbtn(request)
 					{
 						if(request.text.localeCompare(btn[i].innerText) == 0)
 							btn[i].click();
+						else
+							continue;
 					} else {
-							//console.log("click");
 							btn[i].click();
 					}
 					if(request.clicks == 0)

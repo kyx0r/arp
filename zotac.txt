@@ -1,7 +1,7 @@
 https://www.zotacstore.com/us/customer/account/loginPost/
 LOGIN OR CREATE AN ACCOUNT
 queryselector = .button
-text = Login
+text = LOGIN
 
 https://www.zotacstore.com/us/wishlist
 ADD ALL

@@ -36,6 +36,7 @@ function save_options(){
 	localStorage['dpattern1'+preset] = getId('defaultPattern1').value;
 	localStorage['ipattern'+preset] = getId('ignorepattern').value;
 	localStorage['npreset'+preset] = getId('next_preset').value;
+	localStorage['onetimecheck'+preset] = getId('onetimecheck').checked
 
 
 	if(getId('timer01').checked) {
@@ -87,6 +88,7 @@ function read_options(){
  	getId('pmonitor').checked  = (localStorage['pmonitor'+preset] == 'true');
  	getId('timercheck').checked  = (localStorage['timercheck'+preset] == 'true');
  	getId('buttoncheck').checked  = (localStorage['buttoncheck'+preset] == 'true');
+ 	getId('onetimecheck').checked  = (localStorage['onetimecheck'+preset] == 'true');
 
 	// timer
 	if(localStorage['timermode'+preset]) {
