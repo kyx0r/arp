@@ -32,8 +32,20 @@ function sleep(delay) {
 
 function action(query, text, skip, repeat, timeout, value)
 {
+	if (query == undefined)
+		return;
 	var selector = document.querySelectorAll(query);
-	console.log(query, text, skip, repeat, timeout, value);
+	if (text == undefined)
+		text = null;
+	if (skip == undefined)
+		skip = 0;
+	if (repeat == undefined)
+		repeat = 1;
+	if (timeout == undefined)
+		timeout = null;
+	if (value == undefined)
+		value = null;
+	//console.log(query, text, skip, repeat, timeout, value);
 	//console.log(document.body.innerHTML);
 	for (var i = 0; i < selector.length; i++) {
 		if(selector[i] != null)

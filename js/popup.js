@@ -298,6 +298,7 @@ function restoreOptions() {
 		getId('bskip').value = ''
 		getId('btimeout').value = ''
 		getId('bnrepeats').value = ''
+		getId('bvalue').value = ''
 	}
 	if(localStorage['timercheck'+preset] && localStorage['timercheck'+preset] == 'true') {
 		show(getId('timerbox'))
