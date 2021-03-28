@@ -29,9 +29,10 @@ function save_options(){
 	localStorage['ptext'+preset] = getId('ptext').value;
 	localStorage['pskip'+preset] = getId('pskip').value;
 	localStorage['ptimeout'+preset] = getId('ptimeout').value;
-	localStorage['pnclicks'+preset] = getId('pnclicks').value;
+	localStorage['pnrepeats'+preset] = getId('pnrepeats').value;
+	localStorage['pvalue'+preset] = getId('pvalue').value;
 	localStorage['timercheck'+preset] = getId('timercheck').checked;
-	localStorage['buttoncheck'+preset] = getId('buttoncheck').checked
+	localStorage['actioncheck'+preset] = getId('actioncheck').checked
 	localStorage['dpattern'+preset] = getId('defaultPattern').value;
 	localStorage['dpattern1'+preset] = getId('defaultPattern1').value;
 	localStorage['ipattern'+preset] = getId('ignorepattern').value;
@@ -87,7 +88,7 @@ function read_options(){
  	getId('pdcheck').checked  = (localStorage['pdcheck'+preset] == 'true');
  	getId('pmonitor').checked  = (localStorage['pmonitor'+preset] == 'true');
  	getId('timercheck').checked  = (localStorage['timercheck'+preset] == 'true');
- 	getId('buttoncheck').checked  = (localStorage['buttoncheck'+preset] == 'true');
+ 	getId('actioncheck').checked  = (localStorage['actioncheck'+preset] == 'true');
  	getId('onetimecheck').checked  = (localStorage['onetimecheck'+preset] == 'true');
 
 	// timer
@@ -123,7 +124,8 @@ function read_options(){
 	getId('ptext').value = localStorage['ptext'+preset] || '';
 	getId('pskip').value = localStorage['pskip'+preset] || '';
 	getId('ptimeout').value = localStorage['ptimeout'+preset] || '';
-	getId('pnclicks').value = localStorage['pnclicks'+preset] || '';
+	getId('pnrepeats').value = localStorage['pnrepeats'+preset] || '';
+	getId('pvalue').value = localStorage['pvalue'+preset] || '';
 	getId('soundurl').value = localStorage['soundurl'+preset] || '';
 
 

@@ -141,12 +141,13 @@ function startRefresh() {
 		var btext = getId('btext').value;
 		var bskip = getId('bskip').value;
 		var btimeout = getId('btimeout').value;
-		var bnclicks = getId('bnclicks').value;
+		var bnrepeats = getId('bnrepeats').value;
+		var bvalue = getId('bvalue').value;
 	
 		for (var i in views) {
 			if (views[i].loop_start) {
 				views[i].loop_start(preset, -1, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
-							bquery, btext, bskip, btimeout, bnclicks);
+							bquery, btext, bskip, btimeout, bnrepeats, bvalue);
 			}
 		}
 	} else {
@@ -176,7 +177,8 @@ function startTimer() {
 	var btext = getId('btext').value;
 	var bskip = getId('bskip').value;
 	var btimeout = getId('btimeout').value;
-	var bnclicks = getId('bnclicks').value;
+	var bnrepeats = getId('bnrepeats').value;
+	var bvalue = getId('bvalue').value;
 
   	var timer_mode = getId("timermode").value;
 
@@ -197,7 +199,7 @@ function startTimer() {
 			for (var i in views) {
 				if (views[i].loop_start) {
 					views[i].loop_start(preset, waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
-							bquery, btext, bskip, btimeout, bnclicks);
+							bquery, btext, bskip, btimeout, bnrepeats, bvalue);
 				}
 			}
 			getId("timerbtn").value = "Cancel Timer";
@@ -231,7 +233,7 @@ function startTimer() {
 			for (var i in views) {
 				if (views[i].loop_start) {
 					views[i].loop_start(preset, waitTime, myInterval[0], myInterval[1], checkme, page_monitor_pattern, preurl,
-							bquery, btext, bskip, btimeout, bnclicks);
+							bquery, btext, bskip, btimeout, bnrepeats, bvalue);
 				}
 			}
 			getId("timerbtn").value = "Cancel Timer";
@@ -281,25 +283,21 @@ function restoreOptions() {
 		hide(getId('pdurlbox'))
 		getId('pdurlinp').value = ''
 	}
-	if(localStorage['buttoncheck'+preset] && localStorage['buttoncheck'+preset] == 'true'){
-		show(getId('buttonclick'))
-		var bquery = localStorage['pselector'+preset];
-		var btext = localStorage['ptext'+preset];
-		var bskip = localStorage['pskip'+preset];
-		var btimeout = localStorage['ptimeout'+preset];
-		var bnclicks = localStorage['pnclicks'+preset];
-		getId('bselector').value = bquery
-		getId('btext').value = btext
-		getId('bskip').value = bskip
-		getId('btimeout').value = btimeout
-		getId('bnclicks').value = bnclicks
+	if(localStorage['actioncheck'+preset] && localStorage['actioncheck'+preset] == 'true'){
+		show(getId('selaction'))
+		getId('bselector').value = localStorage['pselector'+preset];
+		getId('btext').value = localStorage['ptext'+preset];
+		getId('bskip').value = localStorage['pskip'+preset];
+		getId('btimeout').value = localStorage['ptimeout'+preset];
+		getId('bnrepeats').value = localStorage['pnrepeats'+preset];
+		getId('bvalue').value = localStorage['pvalue'+preset];
 	} else {
-		hide(getId('buttonclick'))
+		hide(getId('selaction'))
 		getId('bselector').value = ''
 		getId('btext').value = ''
-		getId('bskip').value = 0
-		getId('btimeout').value = 100 
-		getId('bnclicks').value = 1
+		getId('bskip').value = ''
+		getId('btimeout').value = ''
+		getId('bnrepeats').value = ''
 	}
 	if(localStorage['timercheck'+preset] && localStorage['timercheck'+preset] == 'true') {
 		show(getId('timerbox'))

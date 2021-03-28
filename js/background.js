@@ -75,7 +75,7 @@ function get_rand_time(tmin, tmax) {
 }
 
 function loop_start(preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
-			bquery, btext, bskip, btimeout, bnclicks) {
+			bquery, btext, bskip, btimeout, bnrepeats, bvalue) {
 
 	getCurrentTab( function(tab) {
 		var currentTabId = tab.id;
@@ -112,7 +112,8 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 			tabs[currentTabId].btext = btext;
 			tabs[currentTabId].bskip = bskip;
 			tabs[currentTabId].btimeout = btimeout;
-			tabs[currentTabId].bnclicks = bnclicks;
+			tabs[currentTabId].bnrepeats = bnrepeats;
+			tabs[currentTabId].bvalue = bvalue;
 		}
 		tabs[currentTabId].interval_time = interval_time;
 		if(interval_type == 'rand') {
@@ -202,7 +203,8 @@ function next_preset(tabId, preset)
 		tabs[tabId].btext = localStorage['ptext'+preset];
 		tabs[tabId].bskip = localStorage['pskip'+preset];
 		tabs[tabId].btimeout = localStorage['ptimeout'+preset];
-		tabs[tabId].bnclicks = localStorage['pnclicks'+preset];
+		tabs[tabId].bnrepeats = localStorage['pnrepeats'+preset];
+		tabs[tabId].bvalue = localStorage['pvalue'+preset];
 	}
 	tabs[tabId].wait_time = 0;
 	tabs[tabId].wait_next_round = 0;
@@ -471,11 +473,12 @@ function reload_it(tabId, tab_url) {
 		var btext = tabs[tabId].btext;
 		var bskip = tabs[tabId].bskip;
 		var btimeout = tabs[tabId].btimeout;
-		var bnclicks = tabs[tabId].bnclicks;
+		var bnrepeats = tabs[tabId].bnrepeats;
+		var bvalue = tabs[tabId].bvalue;
 		var ipattern = localStorage['ipattern'+preset];
 		chrome.tabs.sendMessage(tabId, 
 			{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
-			timeout: btimeout, clicks: bnclicks, pipattern: ipattern},
+			timeout: btimeout, repeat: bnrepeats, value: bvalue, pipattern: ipattern},
 			function(response) {
 		if (chrome.runtime.lastError)
 		{
