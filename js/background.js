@@ -463,8 +463,10 @@ function reload_it(tabId, tab_url) {
 				next_preset(tabId, tabs[tabId].endpreset[tabs[tabId].count]);
 				tabs[tabId].count++;
 				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-			}
-			else
+				if (localStorage['loopback'+preset] = 'true' &&
+						tabs[tabId].endpreset.length == tabs[tabId].count)
+					tabs[tabId].count = 0;
+			} else
 				reload_cancel(tabId, 'yes');
 			return;
 		}
