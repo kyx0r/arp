@@ -93,6 +93,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].yes = false;
 		tabs[currentTabId].count = 0;
 		tabs[currentTabId].endpreset = null;
+		tabs[currentTabId].init = true;
 		var npreset = localStorage['npreset'+preset];
 		if (npreset)
 			tabs[currentTabId].endpreset = npreset.split(',');
@@ -455,6 +456,13 @@ function pause_sound_with_fadeout(sound) {
 function reload_it(tabId, tab_url) {
 	var check_content = tabs[tabId].checkme;
 	if(check_content) {
+		if (tabs[tabId].init)
+		{
+			chrome.browserAction.setBadgeText({text:'', tabId:tabId});
+			updateTab(tabId, preset, tab_url);
+			tabs[tabId].init = false;
+			return;
+		}
 		var preset = tabs[tabId].preset;
 		if (tabs[tabId].yes)
 		{
@@ -462,10 +470,13 @@ function reload_it(tabId, tab_url) {
 			{
 				next_preset(tabId, tabs[tabId].endpreset[tabs[tabId].count]);
 				tabs[tabId].count++;
-				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 				if (localStorage['loopbackcheck'+preset] == 'true' &&
 						tabs[tabId].endpreset.length == tabs[tabId].count)
+				{
 					tabs[tabId].count = 0;
+					chrome.browserAction.setBadgeText({text:'', tabId:tabId});
+					updateTab(tabId, preset, tab_url);
+				}
 			} else
 				reload_cancel(tabId, 'yes');
 			return;

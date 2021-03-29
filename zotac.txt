@@ -1,6 +1,6 @@
 https://www.zotacstore.com/us/customer/account/logout/
+https://www.zotacstore.com/us/customer/account/login
 
-https://www.zotacstore.com/us/customer/account/loginPost/
 LOGIN OR CREATE AN ACCOUNT
 queryselector = #email #pass .button
 text = ||LOGIN
