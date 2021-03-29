@@ -12,12 +12,10 @@ text = Add to Cart
 skip = 9
 
 https://store.zotac.com/paypal/express/start/
-gdprCookieBanner
 queryselector = .ppvx_btn___5-7-4
 timeout = 100
-nclicks = 50
-
+nclicks = 30
 queryselector2 = .btn.full.confirmButton.continueButton
-
+queryselector3 = #payment-submit-btn
 
 Checking your browser
