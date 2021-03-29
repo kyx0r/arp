@@ -472,11 +472,7 @@ function reload_it(tabId, tab_url) {
 				tabs[tabId].count++;
 				if (localStorage['loopbackcheck'+preset] == 'true' &&
 						tabs[tabId].endpreset.length == tabs[tabId].count)
-				{
 					tabs[tabId].count = 0;
-					chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-					updateTab(tabId, preset, tab_url);
-				}
 			} else
 				reload_cancel(tabId, 'yes');
 			return;
