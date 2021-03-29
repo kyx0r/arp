@@ -90,7 +90,7 @@ function read_options(){
  	getId('pmonitor').checked  = (localStorage['pmonitor'+preset] == 'true');
  	getId('timercheck').checked  = (localStorage['timercheck'+preset] == 'true');
  	getId('actioncheck').checked  = (localStorage['actioncheck'+preset] == 'true');
- 	getId('loopbackcheck').checked  = (localStorage['loopback'+preset] == 'true');
+ 	getId('loopbackcheck').checked  = (localStorage['loopbackcheck'+preset] == 'true');
  	getId('onetimecheck').checked  = (localStorage['onetimecheck'+preset] == 'true');
 
 	// timer
