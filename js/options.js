@@ -39,6 +39,7 @@ function save_options(){
 	localStorage['npreset'+preset] = getId('next_preset').value;
 	localStorage['loopbackcheck'+preset] = getId('loopbackcheck').checked
 	localStorage['onetimecheck'+preset] = getId('onetimecheck').checked
+	localStorage['notifcheck'+preset] = getId('notifcheck').checked
 
 
 	if(getId('timer01').checked) {
@@ -92,6 +93,7 @@ function read_options(){
  	getId('actioncheck').checked  = (localStorage['actioncheck'+preset] == 'true');
  	getId('loopbackcheck').checked  = (localStorage['loopbackcheck'+preset] == 'true');
  	getId('onetimecheck').checked  = (localStorage['onetimecheck'+preset] == 'true');
+ 	getId('notifcheck').checked  = (localStorage['notifcheck'+preset] == 'true');
 
 	// timer
 	if(localStorage['timermode'+preset]) {
