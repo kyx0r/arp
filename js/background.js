@@ -33,7 +33,7 @@ var cachetime = 0;
 
 function updateTab(tabId, preset, theurl){
 try {
-	if (localStorage['reloadcheck'+preset] != 'true')
+	if (localStorage['reloadcheck'+preset] == 'true')
 	{
 		onUpdateListener(tabId, {status:"complete"}, null); 
 		return;
@@ -521,7 +521,7 @@ function reload_it(tabId, tab_url) {
 					});
 				});
 			}
-			if (localStorage['reloadcheck'+preset] != 'true') {
+			if (localStorage['reloadcheck'+preset] == 'true') {
 				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 				updateTab(tabId, preset, tab_url);
 			}
