@@ -33,6 +33,11 @@ var cachetime = 0;
 
 function updateTab(tabId, preset, theurl){
 try {
+	if (localStorage['reloadcheck'+preset] != 'true')
+	{
+		onUpdateListener(tabId, {status:"complete"}, null); 
+		return;
+	}
 	var timeout = localStorage['loadtimeout'+preset];
 	if (timeout > 0)
 	{
@@ -184,8 +189,6 @@ function next_preset(tabId, preset)
 			interval_time = 1;
 		tabs[tabId].time_between_load = interval_time;
 	}
-	console.log(tabs[tabId].interval_time);
-	console.log(tabs[tabId].time_between_load);
 
 	if (localStorage['pdcheck'+preset] == 'true') {
 		tabs[tabId].predefined_url = localStorage['pdurl'+preset];
@@ -517,6 +520,10 @@ function reload_it(tabId, tab_url) {
 						});
 					});
 				});
+			}
+			if (localStorage['reloadcheck'+preset] != 'true') {
+				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
+				updateTab(tabId, preset, tab_url);
 			}
 		} else if (response.findresult != "skip") {
 			chrome.browserAction.setBadgeText({text:'', tabId:tabId});
