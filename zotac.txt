@@ -24,3 +24,9 @@ Checking your browser
 
 www.zotacstore.com/us/skin/frontend/tm_themes/theme775/*
 www.zotacstore.com/us/checkout/$document
+
+whitelist: 
+
+https://store.zotac.com/paypal/express/review
+https://www.zotacstore.com/us/paypal/express/review/
+https://www.zotacstore.com/us/refurbished
