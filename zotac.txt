@@ -20,7 +20,8 @@ nclicks = 30
 queryselector2 = .btn.full.confirmButton.continueButton
 queryselector3 = #payment-submit-btn
 
-Checking your browser
+Checking your browser|LOGIN OR CREATE AN ACCOUNT
+15000
 
 www.zotacstore.com/us/skin/frontend/tm_themes/theme775/*
 www.zotacstore.com/us/checkout/$document

@@ -45,6 +45,7 @@ try {
 			clearTimeout(tabs[tabId].ltimeout);
 		tabs[tabId].ltimeout = setTimeout(updateTab, timeout, tabId, preset, theurl);
 	}
+	tabs[tabId].itimer = 0;
 	if (localStorage['cachereloadinterv'+preset] > -1)
 	{
 		var t = new Date().getTime();
@@ -95,6 +96,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].preset = preset;
 		tabs[currentTabId].urlChanged = true;
 		tabs[currentTabId].ltimeout = null;
+		tabs[currentTabId].itimer = 1;
 		tabs[currentTabId].yes = false;
 		tabs[currentTabId].count = 0;
 		tabs[currentTabId].endpreset = null;
@@ -210,6 +212,7 @@ function next_preset(tabId, preset)
 		tabs[tabId].bnrepeats = localStorage['pnrepeats'+preset];
 		tabs[tabId].bvalue = localStorage['pvalue'+preset];
 	}
+	tabs[tabId].itimer = 1;
 	tabs[tabId].wait_time = 0;
 	tabs[tabId].wait_next_round = 0;
 	real_start(tabId, tabs[tabId].action_url); 
@@ -525,7 +528,14 @@ function reload_it(tabId, tab_url) {
 				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 				updateTab(tabId, preset, tab_url);
 			}
-		} else if (response.findresult != "skip") {
+		} else if (response.findresult == "skip") {
+			chrome.browserAction.setBadgeText({text:'skip', tabId:tabId});
+			if (localStorage['skiptimeout'+preset] > 0 && !tabs[tabId].itimer)
+			{
+				tabs[tabId].itimer = localStorage['skiptimeout'+preset];
+				tabs[tabId].ltimeout = setTimeout(updateTab, tabs[tabId].itimer, tabId, preset, tab_url);
+			}
+		} else {
 			chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 			updateTab(tabId, preset, tab_url);
 		}
