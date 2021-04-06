@@ -39,13 +39,10 @@ try {
 		return;
 	}
 	var timeout = localStorage['loadtimeout'+preset];
+	if (tabs[tabId].ltimeout)
+		clearTimeout(tabs[tabId].ltimeout);
 	if (timeout > 0)
-	{
-		if (tabs[tabId].ltimeout)
-			clearTimeout(tabs[tabId].ltimeout);
 		tabs[tabId].ltimeout = setTimeout(updateTab, timeout, tabId, preset, theurl);
-	}
-	tabs[tabId].itimer = 0;
 	if (localStorage['cachereloadinterv'+preset] > -1)
 	{
 		var t = new Date().getTime();
@@ -96,7 +93,6 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].preset = preset;
 		tabs[currentTabId].urlChanged = true;
 		tabs[currentTabId].ltimeout = null;
-		tabs[currentTabId].itimer = 1;
 		tabs[currentTabId].yes = false;
 		tabs[currentTabId].count = 0;
 		tabs[currentTabId].endpreset = null;
@@ -530,11 +526,8 @@ function reload_it(tabId, tab_url) {
 			}
 		} else if (response.findresult == "skip") {
 			chrome.browserAction.setBadgeText({text:'skip', tabId:tabId});
-			if (localStorage['skiptimeout'+preset] > 0 && !tabs[tabId].itimer)
-			{
-				tabs[tabId].itimer = localStorage['skiptimeout'+preset];
-				tabs[tabId].ltimeout = setTimeout(updateTab, tabs[tabId].itimer, tabId, preset, tab_url);
-			}
+			if (localStorage['skiptimeout'+preset] > 0 && !tabs[tabId].ltimeout)
+				tabs[tabId].ltimeout = setTimeout(updateTab, localStorage['skiptimeout'+preset], tabId, preset, tab_url);
 		} else {
 			chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 			updateTab(tabId, preset, tab_url);
