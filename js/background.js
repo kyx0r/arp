@@ -1,8 +1,8 @@
 
 function getCurrentTab(callback) {
     chrome.tabs.query(
-        {  currentWindow: true, active: true, windowType:'normal' },
-        function (array) { callback(array[0]); }
+	{  currentWindow: true, active: true, windowType:'normal' },
+	function (array) { callback(array[0]); }
     );
 }
 
@@ -29,13 +29,21 @@ chrome.extension.onConnect.addListener(function(port) {
 	}
 });
 
+function blockRequest(details) {
+	var tabId = details.tabId;
+	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
+	return {
+		cancel: tabIsReloaderActive
+	};
+}
+
 var cachetime = 0;
 
 function updateTab(tabId, preset, theurl){
 try {
 	if (localStorage['reloadcheck'+preset] == 'true')
 	{
-		onUpdateListener(tabId, {status:"complete"}, null); 
+		onUpdateListener(tabId, {status:"complete"}, null);
 		return;
 	}
 	var timeout = localStorage['loadtimeout'+preset];
@@ -69,6 +77,12 @@ function real_start(tabId, actionUrl) {
 	tabs[tabId].status = 'start';
 	chrome.tabs.onUpdated.addListener(onUpdateListener);
 	chrome.tabs.onRemoved.addListener(onRemoveListener);
+	if (localStorage['blockurls'+tabs[tabId].preset])
+	{
+		chrome.webRequest.onBeforeRequest.addListener(blockRequest, {
+			urls: localStorage['blockurls'+tabs[tabId].preset].split(' ')
+		}, ['blocking']);
+	}
 	reload_it(tabId, actionUrl);
 }
 
@@ -211,7 +225,7 @@ function next_preset(tabId, preset)
 	tabs[tabId].itimer = 1;
 	tabs[tabId].wait_time = 0;
 	tabs[tabId].wait_next_round = 0;
-	real_start(tabId, tabs[tabId].action_url); 
+	real_start(tabId, tabs[tabId].action_url);
 }
 
 function loop_stop() {
@@ -255,7 +269,7 @@ function onUpdateListener(tabId, changeInfo, tab) {
 					setTheBadgeText(tabId);
 				}, 1000, tabId);
 		}
-	} 
+	}
 }
 
 function onRemoveListener(tabId, removeInfo) {
@@ -487,7 +501,7 @@ function reload_it(tabId, tab_url) {
 		var bnrepeats = tabs[tabId].bnrepeats;
 		var bvalue = tabs[tabId].bvalue;
 		var ipattern = localStorage['ipattern'+preset];
-		chrome.tabs.sendMessage(tabId, 
+		chrome.tabs.sendMessage(tabId,
 			{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
 			timeout: btimeout, repeat: bnrepeats, value: bvalue, pipattern: ipattern},
 			function(response) {

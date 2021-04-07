@@ -41,7 +41,7 @@ function save_options(){
 	localStorage['onetimecheck'+preset] = getId('onetimecheck').checked
 	localStorage['notifcheck'+preset] = getId('notifcheck').checked
 	localStorage['reloadcheck'+preset] = getId('reloadcheck').checked
-
+	localStorage['blockurls'+preset] = getId('blockurls').value;
 
 	if(getId('timer01').checked) {
 		localStorage['timermode'+preset] = '1';
@@ -113,6 +113,8 @@ function read_options(){
 	getId('defaultPattern1').value = localStorage['dpattern1'+preset] || '';
 	getId('ignorepattern').value = localStorage['ipattern'+preset] || '';
 	getId('next_preset').value = localStorage['npreset'+preset] || '';
+	getId('blockurls').value = localStorage['blockurls'+preset] || '';
+
 
  	// sound
 	if(localStorage['sound'+preset] && localStorage['sound'+preset] == '2') {
