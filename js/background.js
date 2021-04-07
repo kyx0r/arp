@@ -504,9 +504,10 @@ function reload_it(tabId, tab_url) {
 		var bnrepeats = tabs[tabId].bnrepeats;
 		var bvalue = tabs[tabId].bvalue;
 		var ipattern = localStorage['ipattern'+preset];
+		var lochref = localStorage['lhref'+preset];
 		chrome.tabs.sendMessage(tabId,
 			{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
-			timeout: btimeout, repeat: bnrepeats, value: bvalue, pipattern: ipattern},
+			timeout: btimeout, repeat: bnrepeats, value: bvalue, pipattern: ipattern, lhref: lochref},
 			function(response) {
 		if (chrome.runtime.lastError)
 		{

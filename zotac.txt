@@ -31,3 +31,8 @@ whitelist:
 https://store.zotac.com/paypal/express/review
 https://www.zotacstore.com/us/paypal/express/review/
 https://www.zotacstore.com/us/refurbished
+
+
+
+You have no items in your shopping cart.
+javascript:addAllWItemsToCart(); void 0

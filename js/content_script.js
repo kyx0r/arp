@@ -98,8 +98,8 @@ function actions(request)
 
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
-  	if(request.pipattern)
-  	{
+	if(request.pipattern)
+	{
 		var regex = new RegExp(request.pipattern, "i");
 		//console.log(document.body.innerHTML);
 		if (regex.test(document.body.innerHTML))
@@ -107,7 +107,9 @@ chrome.extension.onMessage.addListener(
 			sendResponse({findresult: "skip"});
 			return;
 		}
-  	}
+	}
+  	if (request.lhref)
+		location.href= request.lhref;
 	var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
