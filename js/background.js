@@ -33,7 +33,7 @@ function blockRequest(details) {
 	var tabId = details.tabId;
 	var truth = false;
 	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
-	if (localStorage['blockurls'+tabs[tabId].preset] && tabIsReloaderActive)
+	if (tabIsReloaderActive && localStorage['blockurls'+tabs[tabId].preset])
 		truth = true;
 	return {
 		cancel: truth
