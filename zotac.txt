@@ -14,6 +14,7 @@ text = Add to Cart
 skip = 9
 
 https://store.zotac.com/paypal/express/start/
+https://www.zotacstore.com/us/paypal/express/start/
 queryselector = .ppvx_btn___5-7-4
 timeout = 100
 nclicks = 30
@@ -33,6 +34,29 @@ https://www.zotacstore.com/us/paypal/express/review/
 https://www.zotacstore.com/us/refurbished
 
 
-
-You have no items in your shopping cart.
+Cart Subtotal
 javascript:addAllWItemsToCart(); void 0
+
+
+// Inject the refreshing iframe.
+document.getElementsByTagName("html")[0].innerHTML = '<iframe id="refreshFrame" src="https://www.zotacstore.com/us/customer/account/index/" style="position: absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%;"></iframe>';
+ 
+// Refresh the page every minute.
+setInterval(function(){
+	document.getElementById('refreshFrame').src = 'https://www.zotacstore.com/us/customer/account/index/'
+}, 60 * 5 * 1000);
+ 
+// Determine if we are still logged in every 15 seconds.
+// This does not mean it refreshes every 15 seconds, just that this particular event runs every 15 seconds.
+setInterval(function(){
+	let frame = document.querySelectorAll('#refreshFrame')[0]
+	if(!frame){
+		return;
+	}
+ 
+    if(frame.contentDocument.querySelectorAll('#login-form').length > 0){
+        frame.contentDocument.querySelectorAll('#email')[0].value = 'yourzotac@email.com';
+        frame.contentDocument.querySelectorAll('#pass')[0].value = 'yourzotacpassword';
+        frame.contentDocument.querySelectorAll('#login-form')[0].submit()
+    }
+}, 15000);
