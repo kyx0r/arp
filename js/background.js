@@ -29,18 +29,29 @@ chrome.extension.onConnect.addListener(function(port) {
 	}
 });
 
+function wildTest(wildcard, str) {
+	let w = wildcard.replace(/[.+^${}()|[\]\\]/g, '\\$&'); // regexp escape 
+	const re = new RegExp(`^${w.replace(/\*/g,'.*').replace(/\?/g,'.')}$`,'i');
+	return re.test(str); // remove last 'i' above to have case sensitive
+}
+
 function blockRequest(details) {
 	var tabId = details.tabId;
 	var truth = false;
 	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
-	if (tabIsReloaderActive && localStorage['blockurls'+tabs[tabId].preset])
-		truth = true;
+	var urls = localStorage['blockurls'+tabs[tabId].preset].split(' ');
+	for (var i = 0; i < urls.length; i++)
+	{
+		if (tabIsReloaderActive && wildTest(urls[i], details.url))
+		{
+			truth = true;
+			break;
+		}
+	}
 	return {
 		cancel: truth
 	};
 }
-
-var cachetime = 0;
 
 function updateTab(tabId, preset, theurl){
 try {
@@ -57,10 +68,10 @@ try {
 	if (localStorage['cachereloadinterv'+preset] > -1)
 	{
 		var t = new Date().getTime();
-		if (t > cachetime)
+		if (t > tabs[tabId].cachetime)
 		{
 			chrome.tabs.reload(tabId, {bypassCache: true});
-			cachetime = t + localStorage['cachereloadinterv'+preset] * 1000;
+			tabs[tabId].cachetime = t + localStorage['cachereloadinterv'+preset] * 1000;
 		} else
 			chrome.tabs.reload(tabId);
 	} else
@@ -82,9 +93,13 @@ function real_start(tabId, actionUrl) {
 	chrome.tabs.onRemoved.addListener(onRemoveListener);
 	if (localStorage['blockurls'+tabs[tabId].preset])
 	{
-		chrome.webRequest.onBeforeRequest.addListener(blockRequest, {
-			urls: localStorage['blockurls'+tabs[tabId].preset].split(' ')
-		}, ['blocking']);
+		try{
+			chrome.webRequest.onBeforeRequest.addListener(blockRequest, {
+				urls: localStorage['blockurls'+tabs[tabId].preset].split(' ')
+			}, ['blocking']);
+		} catch (e) {
+			console.error(e);
+		}
 	}
 	reload_it(tabId, actionUrl);
 }
@@ -112,6 +127,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].ltimeout = null;
 		tabs[currentTabId].yes = false;
 		tabs[currentTabId].count = 0;
+		tabs[currentTabId].cachetime = 0;
 		tabs[currentTabId].endpreset = null;
 		tabs[currentTabId].init = true;
 		var npreset = localStorage['npreset'+preset];
