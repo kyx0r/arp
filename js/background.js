@@ -39,13 +39,16 @@ function blockRequest(details) {
 	var tabId = details.tabId;
 	var truth = false;
 	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
-	var urls = localStorage['blockurls'+tabs[tabId].preset].split(' ');
-	for (var i = 0; i < urls.length; i++)
+	if (tabIsReloaderActive)
 	{
-		if (tabIsReloaderActive && wildTest(urls[i], details.url))
+		var urls = localStorage['blockurls'+tabs[tabId].preset].split(' ');
+		for (var i = 0; i < urls.length; i++)
 		{
-			truth = true;
-			break;
+			if (wildTest(urls[i], details.url))
+			{
+				truth = true;
+				break;
+			}
 		}
 	}
 	return {
