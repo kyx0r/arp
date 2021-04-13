@@ -15,29 +15,19 @@ skip = 9
 
 https://store.zotac.com/paypal/express/start/
 https://www.zotacstore.com/us/paypal/express/start/
-queryselector = .ppvx_btn___5-7-4
-timeout = 100
-nclicks = 30
+https://www.zotacstore.com/us/checkout/cart/
 queryselector2 = .btn.full.confirmButton.continueButton
 queryselector3 = #payment-submit-btn
+timeout = 100
+nclicks = 30
 
 Checking your browser|LOGIN OR CREATE AN ACCOUNT
 15000
 
-www.zotacstore.com/us/skin/frontend/tm_themes/theme775/*
-www.zotacstore.com/us/checkout/$document
-
-whitelist: 
-
-https://store.zotac.com/paypal/express/review
-https://www.zotacstore.com/us/paypal/express/review/
-https://www.zotacstore.com/us/refurbished
-
+https://www.zotacstore.com/us/skin/frontend/tm_themes/theme775/*
 
 Cart Subtotal
-setInterval(function(){ addAllWItemsToCart(); }, 2000);
-
-
+addAllWItemsToCart();
 
 // Inject the refreshing iframe.
 document.getElementsByTagName("html")[0].innerHTML = '<iframe id="refreshFrame" src="https://www.zotacstore.com/us/customer/account/index/" style="position: absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%;"></iframe>';
