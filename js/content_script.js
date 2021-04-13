@@ -100,7 +100,6 @@ chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
 	if (request.pattern == 'E')
 	{
-		console.log("here");
 		var script = document.createElement('script');
 		script.textContent = request.code;
 		(document.head||document.documentElement).appendChild(script);
