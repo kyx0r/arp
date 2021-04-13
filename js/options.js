@@ -41,6 +41,7 @@ function save_options(){
 	localStorage['onetimecheck'+preset] = getId('onetimecheck').checked
 	localStorage['notifcheck'+preset] = getId('notifcheck').checked
 	localStorage['reloadcheck'+preset] = getId('reloadcheck').checked
+	localStorage['completecheck'+preset] = getId('completecheck').checked
 	localStorage['blockurls'+preset] = getId('blockurls').value;
 	localStorage['lhref'+preset] = getId('lhref').value;
 
@@ -98,6 +99,7 @@ function read_options(){
  	getId('onetimecheck').checked  = (localStorage['onetimecheck'+preset] == 'true');
  	getId('notifcheck').checked  = (localStorage['notifcheck'+preset] == 'true');
  	getId('reloadcheck').checked  = (localStorage['reloadcheck'+preset] == 'true');
+ 	getId('completecheck').checked  = (localStorage['completecheck'+preset] == 'true');
 
 	// timer
 	if(localStorage['timermode'+preset]) {

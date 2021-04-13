@@ -60,7 +60,8 @@ function updateTab(tabId, preset, theurl){
 try {
 	if (localStorage['reloadcheck'+preset] == 'true')
 	{
-		onUpdateListener(tabId, {status:"complete"}, null);
+		if (localStorage['completecheck'+preset] == 'true')
+			onUpdateListener(tabId, {status:"complete"}, null);
 		return;
 	}
 	var timeout = localStorage['loadtimeout'+preset];
