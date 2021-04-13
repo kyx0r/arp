@@ -35,7 +35,8 @@ https://www.zotacstore.com/us/refurbished
 
 
 Cart Subtotal
-javascript:addAllWItemsToCart(); void 0
+setInterval(function(){ addAllWItemsToCart(); }, 2000);
+
 
 
 // Inject the refreshing iframe.

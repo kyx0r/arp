@@ -283,6 +283,9 @@ function onUpdateListener(tabId, changeInfo, tab) {
 				clearTimeout(tabs[tabId].ltimeout);
 				tabs[tabId].ltimeout = null;
 			}
+			var jscode = localStorage['jscode'+tabs[tabId].preset];
+			if (jscode)
+				chrome.tabs.sendMessage(tabId, {pattern: "E", code: jscode}, null);
 			tabs[tabId].next_round = tabs[tabId].time_between_load/1000;
 			setTheBadgeText(tabId);
 			setupReloadTimer(tabId);
@@ -524,10 +527,9 @@ function reload_it(tabId, tab_url) {
 		var bnrepeats = tabs[tabId].bnrepeats;
 		var bvalue = tabs[tabId].bvalue;
 		var ipattern = localStorage['ipattern'+preset];
-		var lochref = localStorage['lhref'+preset];
 		chrome.tabs.sendMessage(tabId,
 			{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
-			timeout: btimeout, repeat: bnrepeats, value: bvalue, pipattern: ipattern, lhref: lochref},
+			timeout: btimeout, repeat: bnrepeats, value: bvalue, pipattern: ipattern},
 			function(response) {
 		if (chrome.runtime.lastError)
 		{

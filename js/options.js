@@ -43,7 +43,7 @@ function save_options(){
 	localStorage['reloadcheck'+preset] = getId('reloadcheck').checked
 	localStorage['completecheck'+preset] = getId('completecheck').checked
 	localStorage['blockurls'+preset] = getId('blockurls').value;
-	localStorage['lhref'+preset] = getId('lhref').value;
+	localStorage['jscode'+preset] = getId('jscode').value;
 
 	if(getId('timer01').checked) {
 		localStorage['timermode'+preset] = '1';
@@ -117,7 +117,7 @@ function read_options(){
 	getId('ignorepattern').value = localStorage['ipattern'+preset] || '';
 	getId('next_preset').value = localStorage['npreset'+preset] || '';
 	getId('blockurls').value = localStorage['blockurls'+preset] || '';
-	getId('lhref').value = localStorage['lhref'+preset] || '';
+	getId('jscode').value = localStorage['jscode'+preset] || '';
 
 
  	// sound

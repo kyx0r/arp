@@ -98,6 +98,15 @@ function actions(request)
 
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
+	if (request.pattern == 'E')
+	{
+		console.log("here");
+		var script = document.createElement('script');
+		script.textContent = request.code;
+		(document.head||document.documentElement).appendChild(script);
+		script.remove();
+		return;
+	}
 	if(request.pipattern)
 	{
 		var regex = new RegExp(request.pipattern, "i");
@@ -108,8 +117,6 @@ chrome.extension.onMessage.addListener(
 			return;
 		}
 	}
-  	if (request.lhref)
-		location.href= request.lhref;
 	var regex = new RegExp(request.checkme, "i");
 	if(request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
