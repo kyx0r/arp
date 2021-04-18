@@ -37,7 +37,6 @@ function wildTest(wildcard, str) {
 
 function blockRequest(details) {
 	var tabId = details.tabId;
-	var truth = false;
 	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
 	if (tabIsReloaderActive)
 	{
@@ -45,20 +44,32 @@ function blockRequest(details) {
 		for (var i = 0; i < urls.length; i++)
 		{
 			if (wildTest(urls[i], details.url))
+				return { cancel: true };
+		}
+		urls = localStorage['waiturls'+tabs[tabId].preset].split(' ');
+		for (var i = 0; i < urls.length; i++)
+		{
+			if (wildTest(urls[i], details.url))
 			{
-				truth = true;
+				tabs[tabId].request_status = 1;
 				break;
 			}
 		}
 	}
-	return {
-		cancel: truth
-	};
+	return { cancel: false };
+}
+
+function completeRequest(details)
+{
+	var tabId = details.tabId;
+	var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
+	if (tabIsReloaderActive)
+		tabs[tabId].request_status = 0;
 }
 
 function updateTab(tabId, preset, theurl){
 try {
-	if (localStorage['reloadcheck'+preset] == 'true')
+	if (localStorage['reloadcheck'+preset] == 'true' || tabs[tabId].request_status)
 	{
 		if (localStorage['completecheck'+preset] == 'true')
 			onUpdateListener(tabId, {status:"complete"}, null);
@@ -95,12 +106,19 @@ function real_start(tabId, actionUrl) {
 	tabs[tabId].status = 'start';
 	chrome.tabs.onUpdated.addListener(onUpdateListener);
 	chrome.tabs.onRemoved.addListener(onRemoveListener);
-	if (localStorage['blockurls'+tabs[tabId].preset])
+	var burls = localStorage['blockurls'+tabs[tabId].preset];
+	var wurls = localStorage['waiturls'+tabs[tabId].preset];
+	if (burls || wurls)
 	{
+		var arr = burls.split(' ');
 		try{
-			chrome.webRequest.onBeforeRequest.addListener(blockRequest, {
-				urls: localStorage['blockurls'+tabs[tabId].preset].split(' ')
-			}, ['blocking']);
+			if (wurls) {
+				wurls = wurls.split(' ');
+				chrome.webRequest.onCompleted.addListener(completeRequest, { urls: wurls });
+				chrome.webRequest.onErrorOccurred.addListener(completeRequest, { urls: wurls });
+				arr = arr.concat(wurls);
+			}
+			chrome.webRequest.onBeforeRequest.addListener(blockRequest, { urls: arr }, ['blocking']);
 		} catch (e) {
 			console.error(e);
 		}
@@ -134,6 +152,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].cachetime = 0;
 		tabs[currentTabId].endpreset = null;
 		tabs[currentTabId].init = true;
+		tabs[currentTabId].request_status = 0;
 		var npreset = localStorage['npreset'+preset];
 		if (npreset)
 			tabs[currentTabId].endpreset = npreset.split(',');

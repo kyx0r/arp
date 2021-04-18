@@ -43,6 +43,7 @@ function save_options(){
 	localStorage['reloadcheck'+preset] = getId('reloadcheck').checked
 	localStorage['completecheck'+preset] = getId('completecheck').checked
 	localStorage['blockurls'+preset] = getId('blockurls').value;
+	localStorage['waiturls'+preset] = getId('waiturls').value;
 	localStorage['jscode'+preset] = getId('jscode').value;
 
 	if(getId('timer01').checked) {
@@ -117,6 +118,7 @@ function read_options(){
 	getId('ignorepattern').value = localStorage['ipattern'+preset] || '';
 	getId('next_preset').value = localStorage['npreset'+preset] || '';
 	getId('blockurls').value = localStorage['blockurls'+preset] || '';
+	getId('waiturls').value = localStorage['waiturls'+preset] || '';
 	getId('jscode').value = localStorage['jscode'+preset] || '';
 
 
