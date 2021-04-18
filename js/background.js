@@ -46,13 +46,15 @@ function blockRequest(details) {
 			if (wildTest(urls[i], details.url))
 				return { cancel: true };
 		}
-		urls = localStorage['waiturls'+tabs[tabId].preset].split(' ');
-		for (var i = 0; i < urls.length; i++)
-		{
-			if (wildTest(urls[i], details.url))
+		if (localStorage['waiturls'+tabs[tabId].preset]) {
+			urls = localStorage['waiturls'+tabs[tabId].preset].split(' ');
+			for (var i = 0; i < urls.length; i++)
 			{
-				tabs[tabId].request_status = 1;
-				break;
+				if (wildTest(urls[i], details.url))
+				{
+					tabs[tabId].request_status = 1;
+					break;
+				}
 			}
 		}
 	}
