@@ -6,6 +6,7 @@ LOGIN OR CREATE AN ACCOUNT
 queryselector = #email #pass .button
 text = ||LOGIN
 text2 = ||Login
+block: https://www.zotacstore.com/us/skin/frontend/tm_themes/theme775/* https://www.zotacstore.com/us/customer/account/ https://www.zotacstore.com/us/wishlist*
 
 https://www.zotacstore.com/us/wishlist
 ADD ALL
@@ -13,21 +14,23 @@ queryselector = .button.btn-cart
 text = Add to Cart
 skip = 9
 
+Cart Subtotal
+addAllWItemsToCart();
+block: https://www.zotacstore.com/us/checkout/cart/ https://www.zotacstore.com/us/skin/frontend/tm_themes/theme775/* https://www.zotacstore.com/us/customer/account/index/
+wait: https://www.zotacstore.com/us/wishlist/index*
+
 https://store.zotac.com/paypal/express/start/
 https://www.zotacstore.com/us/paypal/express/start/
 https://www.zotacstore.com/us/checkout/cart/
 queryselector2 = .btn.full.confirmButton.continueButton
 queryselector3 = #payment-submit-btn
 timeout = 100
-nclicks = 30
+nclicks = 50
 
 Checking your browser|LOGIN OR CREATE AN ACCOUNT
 15000
 
 https://www.zotacstore.com/us/skin/frontend/tm_themes/theme775/*
-
-Cart Subtotal
-addAllWItemsToCart();
 
 // Inject the refreshing iframe.
 document.getElementsByTagName("html")[0].innerHTML = '<iframe id="refreshFrame" src="https://www.zotacstore.com/us/customer/account/index/" style="position: absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%;"></iframe>';
