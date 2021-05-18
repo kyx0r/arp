@@ -1,56 +1,21 @@
-https://www.zotacstore.com/us/customer/account/logout/
-https://www.zotacstore.com/us/customer/account/login
-https://www.zotacstore.com/us/customer/account/index/
-
-LOGIN OR CREATE AN ACCOUNT
-queryselector = #email #pass .button
-text = ||LOGIN
-text2 = ||Login
-block: https://www.zotacstore.com/us/skin/frontend/tm_themes/theme775/* https://www.zotacstore.com/us/customer/account/ https://www.zotacstore.com/us/wishlist*
-
-https://www.zotacstore.com/us/wishlist
-ADD ALL
-queryselector = .button.btn-cart
+predefurl = https://us.zotacstore.com/us/wishlist
+queryselector = .action.btn.btn-primary
 text = Add to Cart
-skip = 9
-
-Cart Subtotal
-addAllWItemsToCart();
-block: https://www.zotacstore.com/us/checkout/cart/ https://www.zotacstore.com/us/skin/frontend/tm_themes/theme775/* https://www.zotacstore.com/us/customer/account/index/
-wait: https://www.zotacstore.com/us/wishlist/index*
-
-https://store.zotac.com/paypal/express/start/
-https://www.zotacstore.com/us/paypal/express/start/
-https://www.zotacstore.com/us/checkout/cart/
-queryselector2 = .btn.full.confirmButton.continueButton
-queryselector3 = #payment-submit-btn
 timeout = 100
-nclicks = 50
+nrepeats = 25
+regex1 = Add All to Cart
+ignoreregex = Checking your browser
+reloadlonger = 20000
+runonce = 1
+runnotif = 1
 
-Checking your browser|LOGIN OR CREATE AN ACCOUNT
-15000
-
-https://www.zotacstore.com/us/skin/frontend/tm_themes/theme775/*
-
-// Inject the refreshing iframe.
-document.getElementsByTagName("html")[0].innerHTML = '<iframe id="refreshFrame" src="https://www.zotacstore.com/us/customer/account/index/" style="position: absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%;"></iframe>';
- 
-// Refresh the page every minute.
-setInterval(function(){
-	document.getElementById('refreshFrame').src = 'https://www.zotacstore.com/us/customer/account/index/'
-}, 60 * 5 * 1000);
- 
-// Determine if we are still logged in every 15 seconds.
-// This does not mean it refreshes every 15 seconds, just that this particular event runs every 15 seconds.
-setInterval(function(){
-	let frame = document.querySelectorAll('#refreshFrame')[0]
-	if(!frame){
-		return;
-	}
- 
-    if(frame.contentDocument.querySelectorAll('#login-form').length > 0){
-        frame.contentDocument.querySelectorAll('#email')[0].value = 'yourzotac@email.com';
-        frame.contentDocument.querySelectorAll('#pass')[0].value = 'yourzotacpassword';
-        frame.contentDocument.querySelectorAll('#login-form')[0].submit()
-    }
-}, 15000);
+predefurl = https://us.zotacstore.com/us/paypal/express/start/
+blockurl = https://us.zotacstore.com/us/checkout/cart/
+queryselector = .btn.full.confirmButton.continueButton #payment-submit-btn
+timeout = 100 100
+nrepeats = 1 50
+regex1 = paypalobjects
+ignoreregex = Checking your browser
+reloadlonger = 10000
+runonce = 1
+runnotif = 1
