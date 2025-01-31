@@ -96,6 +96,21 @@ function actions(request)
 	}
 }
 
+// Check if the page has already loaded
+if (document.readyState === 'complete') {
+  chrome.runtime.sendMessage({ type: 'pageLoad', status: 'load' });
+} else {
+  // Listen for DOM content loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    chrome.runtime.sendMessage({ type: 'pageLoad', status: 'DOMContentLoaded' });
+  });
+
+  // Listen for full page load (including images/stylesheets)
+  window.addEventListener('load', () => {
+    chrome.runtime.sendMessage({ type: 'pageLoad', status: 'load' });
+  });
+}
+
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
 	if (request.pattern == 'E')

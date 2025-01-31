@@ -24,7 +24,7 @@
    "options_page": "options.html",
    "permissions": [ "tabs", "http://*/*", "https://*/*", "webNavigation","storage", "notifications", "webRequest", "webRequestBlocking"],
    "version": "6.3.0",
-   "homepage_url":"https://github.com/lomholdt/arp",
+   "homepage_url":"https://github.com/kyx0r/arp",
    "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
    "web_accessible_resources": [ "blank.html" ]
 }
