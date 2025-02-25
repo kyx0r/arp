@@ -88,8 +88,6 @@ function save_options(){
 	localStorage['skiptimeout'+preset] = getId('skiptimeout').value;
 
 	localStorage.support = !(getId('dontsupport').checked);
-
-	show_save_animation();
 }
 
 function read_options(){
@@ -167,11 +165,6 @@ function read_options(){
 	getId('skiptimeout').value = localStorage['skiptimeout'+preset] || 0;
 
 	getId('dontsupport').checked = (localStorage.support == 'false');
-}
-
-
-function show_save_animation() {
-  alert('Settings was saved.');
 }
 
 var sound = new Audio();
