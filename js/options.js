@@ -62,6 +62,12 @@ function save_options(){
 		localStorage['sound'+preset] = '3';
 	} else if(getId('pmsound04').checked) {
 		localStorage['sound'+preset] = '4';
+	} else if(getId('pmsound05').checked) {
+		localStorage['sound'+preset] = '5';
+	} else if(getId('pmsound06').checked) {
+		localStorage['sound'+preset] = '6';
+	} else if(getId('pmsound07').checked) {
+		localStorage['sound'+preset] = '7';
 	}
 
 	localStorage['soundurl'+preset] = getId('soundurl').value;
@@ -129,6 +135,12 @@ function read_options(){
 		getId('pmsound03').checked = true;
 	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '4') {
 		getId('pmsound04').checked = true;
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '5') {
+		getId('pmsound05').checked = true;
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '6') {
+		getId('pmsound06').checked = true;
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '7') {
+		getId('pmsound07').checked = true;
 	} else {
 		getId('pmsound01').checked = true;
 	}
@@ -174,6 +186,12 @@ function play_sound() {
 	else if(getId('pmsound03').checked)
 		var sound_file = './sound/sound2.mp3';
 	else if(getId('pmsound04').checked)
+		var sound_file = './sound/newegg.mp3';
+	else if(getId('pmsound05').checked)
+		var sound_file = './sound/walmart.mp3';
+	else if(getId('pmsound06').checked)
+		var sound_file = './sound/msi.mp3';
+	else if(getId('pmsound07').checked)
 		var sound_file = getId('soundurl').value;
 
 	if (sound_file) {

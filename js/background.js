@@ -545,6 +545,12 @@ function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '3') {
 		sound_file = './sound/sound2.mp3';
 	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '4') {
+		sound_file = './sound/newegg.mp3';
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '5') {
+		sound_file = './sound/walmart.mp3';
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '6') {
+		sound_file = './sound/msi.mp3';
+	} else if(localStorage['sound'+preset] && localStorage['sound'+preset] == '7') {
 		if(localStorage['soundurl'+preset]) {
 			sound_file = localStorage['soundurl'+preset];
 		} else {
