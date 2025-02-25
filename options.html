@@ -35,7 +35,7 @@ fieldset {
 			</tr>
 			<tr><td colspan="2">&nbsp;</td></tr>
 
-			<td width="180px">
+			<td width="280px">
 			<label for="presets">Select Preset&nbsp;&nbsp;&nbsp;&nbsp;</label>
 			<select name="presets" id="presets">
 				<option value="0">0</option>
@@ -51,12 +51,15 @@ fieldset {
 			</select>
 			<tr><td colspan="2">&nbsp;</td></tr>
 			</td>
+			<td><label for="default_time">Preset name:</label></td>
+			<td><input type="text" size="10" value="" id="preset_name"></td>
+			<tr><td colspan="2">&nbsp;</td></tr>
 
 			<tr>
 			<td width="180px">
 			<label for="default_time">Default Time Interval:&nbsp;&nbsp;&nbsp;&nbsp;</label>
 			</td>
-			<td><input type="number" size="4" value="12" min="0" max="9999" id="default_time"> <label for="default_time">seconds</label></td>
+			<td><input type="number" size="4" value="5" min="0" max="9999" id="default_time"> <label for="default_time">seconds</label></td>
 			</tr>
 			<tr><td colspan="2">&nbsp;</td></tr>
 			<tr>
@@ -65,6 +68,12 @@ fieldset {
 			<label for="default_time">Enable Random Interval:&nbsp;&nbsp;&nbsp;&nbsp;</label>
 			</td>
 			<td><input type="checkbox" name="randomTime" id="randomTime"></td>
+			</tr>
+
+			<td width="180px">
+			<label for="default_time">Enable Custom Interval:&nbsp;&nbsp;&nbsp;&nbsp;</label>
+			</td>
+			<td><input type="checkbox" name="customTime" id="customTime"></td>
 			</tr>
 			<tr><td colspan="2">&nbsp;</td></tr>
 			<tr><td>How to: <a id="incognito" href="chrome://extensions/?id=oilipfekkmncanaajkapbpancpelijih" target="_blank">Allow in incognito</a></td></tr>
@@ -260,41 +269,41 @@ fieldset {
 			<tr><td colspan="2">&nbsp;</td></tr>
 			<tr>
 			<td width="180px">
-			<label for="loopbackcheck">Loop reload</label>
+			<label for="loopbackcheck">End next preset</label>
 			</td>
 			<td style="text-align:left;"><input type="checkbox" name="loopbackcheck" id="loopbackcheck"></td>
 			</tr>
 			<tr>
 			<tr>
 			<td width="180px">
-			<label for="onetimecheck">Check / Run once</label>
+			<label for="onetimecheck">Continue Running</label>
 			</td>
 			<td style="text-align:left;"><input type="checkbox" name="onetimecheck" id="onetimecheck"></td>
 			</tr>
 			<tr>
 			<tr>
 			<td width="180px">
-			<label for="notifcheck">Show / Run notification</label>
+			<label for="notifcheck">Don't show notification</label>
 			</td>
 			<td style="text-align:left;"><input type="checkbox" name="notifcheck" id="notifcheck"></td>
 			</tr>
 			<tr>
 			<tr>
 			<td width="180px">
-			<label for="reloadcheck">Don't Reload page</label>
+			<label for="reloadcheck">Continue Reloading</label>
 			</td>
 			<td style="text-align:left;"><input type="checkbox" name="reloadcheck" id="reloadcheck"></td>
 			</tr>
 			<tr>
 			<tr>
 			<td width="180px">
-			<label for="completecheck">Complete page when noreload</label>
+			<label for="completecheck">Complete page load</label>
 			</td>
 			<td style="text-align:left;"><input type="checkbox" name="completecheck" id="completecheck"></td>
 			</tr>
 			<tr><td colspan="2">&nbsp;</td></tr>
 			<tr>
-			
+
 			<div id="html1" style="position:absolute; overflow:hidden; left:0px; top:0px; width:0px; height:0px; z-index:0">
 			<input type="checkbox" name="dontsupport" id="dontsupport" /></div>
 

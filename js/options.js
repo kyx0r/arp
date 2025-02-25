@@ -21,8 +21,10 @@ function save_options(){
 		getId('default_time').value = 0;
 	}
 
+	localStorage['preset_name'+preset] = getId('preset_name').value;
 	localStorage['default_time'+preset] = getId('default_time').value;
 	localStorage['random_time'+preset] = getId('randomTime').checked
+	localStorage['custom_time'+preset] = getId('customTime').checked
 	localStorage['pdcheck'+preset] = getId('pdcheck').checked
 	localStorage['pdurl'+preset] = getId('pdurl').value;
 	localStorage['pselector'+preset] = getId('pselector').value;
@@ -96,6 +98,7 @@ function read_options(){
 	}
 
  	getId('randomTime').checked  = (localStorage['random_time'+preset] == 'true');
+	getId('customTime').checked = (localStorage['custom_time'+preset] == 'true');
  	getId('pdcheck').checked  = (localStorage['pdcheck'+preset] == 'true');
  	getId('pmonitor').checked  = (localStorage['pmonitor'+preset] == 'true');
  	getId('timercheck').checked  = (localStorage['timercheck'+preset] == 'true');
@@ -116,7 +119,11 @@ function read_options(){
 	} else {
 		getId('timer01').checked = true;
 	}
+	var psets = getId('presets');
+	for (var i = 0; i < psets.length; i++)
+		psets[i].innerHTML = i + ' ' + (localStorage['preset_name'+i] || '');
 
+	getId('preset_name').value = localStorage['preset_name'+preset] || '';
 	getId('defaultPattern').value = localStorage['dpattern'+preset] || '';
 	getId('defaultPattern1').value = localStorage['dpattern1'+preset] || '';
 	getId('ignorepattern').value = localStorage['ipattern'+preset] || '';

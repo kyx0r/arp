@@ -4,6 +4,9 @@ var pchange = 0;
 
 ready(() => {
 	console = chrome.extension.getBackgroundPage().console;
+	var psets = getId('ppresets');
+	for (var i = 0; i < psets.length; i++)
+		psets[i].innerHTML = i + ' ' + (localStorage['preset_name'+i] || '');
 	pchange = 0;
 	if(localStorage['preset'])
 	{
@@ -256,26 +259,26 @@ function startTimer() {
 }
 
 function restoreOptions() {
-	if(localStorage['default_time'+preset]) {
+	if (localStorage['default_time'+preset]) {
 		set_interval(localStorage['default_time'+preset] * 1000, "custom");
 	}
-	if(localStorage['random_time'+preset] == 'true') {
+	if (localStorage['random_time'+preset] == 'true') {
 		show(getId('randombox'))
 	} else
 		hide(getId('randombox'))
-	if(localStorage['pmonitor'+preset] && localStorage['pmonitor'+preset] == 'true'){
+	if (localStorage['custom_time'+preset] == 'true') {
+		show(getId('custombox'))
+	} else
+		hide(getId('custombox'))
+	if (localStorage['pmonitor'+preset] && localStorage['pmonitor'+preset] == 'true'){
 		show(getId('monitorbox'))
-		if(localStorage['dpattern'+preset]){ // only show button if default text is set
-			show(getId('default-value-button'))
-		} else 
-			hide(getId('default-value-button'))
-		if(localStorage['dpattern1'+preset]){ // only show button if default text is set
-			show(getId('default-value-button1'))
-		} else
-			hide(getId('default-value-button1'))
+		show(getId('default-value-button'))
+		getId('contentid').value = localStorage['dpattern'+preset]
+		show(getId('default-value-button1'))
+		getId('contentid1').value = localStorage['dpattern1'+preset]
 	} else 
 		hide(getId('monitorbox'))
-	if(localStorage['pdcheck'+preset] && localStorage['pdcheck'+preset] == 'true'){
+	if (localStorage['pdcheck'+preset] && localStorage['pdcheck'+preset] == 'true'){
 		show(getId('pdurlbox'))
 		var pdurl = localStorage['pdurl'+preset];
 		getId('pdurlinp').value = pdurl
@@ -283,7 +286,7 @@ function restoreOptions() {
 		hide(getId('pdurlbox'))
 		getId('pdurlinp').value = ''
 	}
-	if(localStorage['actioncheck'+preset] && localStorage['actioncheck'+preset] == 'true'){
+	if (localStorage['actioncheck'+preset] && localStorage['actioncheck'+preset] == 'true'){
 		show(getId('selaction'))
 		getId('bselector').value = localStorage['pselector'+preset];
 		getId('btext').value = localStorage['ptext'+preset];
@@ -300,7 +303,7 @@ function restoreOptions() {
 		getId('bnrepeats').value = ''
 		getId('bvalue').value = ''
 	}
-	if(localStorage['timercheck'+preset] && localStorage['timercheck'+preset] == 'true') {
+	if (localStorage['timercheck'+preset] && localStorage['timercheck'+preset] == 'true') {
 		show(getId('timerbox'))
 		if(localStorage['timermode'+preset] == "1") {
 			show(getId('countdownMode'))
@@ -319,13 +322,13 @@ function restoreOptions() {
 	} else 
 		hide(getId('timerbox'))
 	// Set times if already defined
-	if(localStorage['customHour'+preset]){
+	if (localStorage['customHour'+preset]){
 		getId('hours').value = localStorage.customHour
 	}
-	if(localStorage['customMinute'+preset]){
+	if (localStorage['customMinute'+preset]){
 		getId('minutes').value = localStorage.customMinute
 	}
-	if(localStorage['customSecond'+preset]){
+	if (localStorage['customSecond'+preset]){
 		getId('seconds').value = localStorage.customSecond
 	}
 

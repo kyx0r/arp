@@ -71,10 +71,9 @@ function completeRequest(details)
 
 function updateTab(tabId, preset, theurl){
 try {
-	if (localStorage['reloadcheck'+preset] == 'true' || tabs[tabId].request_status)
+	if (localStorage['completecheck'+preset] == 'true' && tabs[tabId].request_status)
 	{
-		if (localStorage['completecheck'+preset] == 'true')
-			onUpdateListener(tabId, {status:"complete"}, null);
+		onUpdateListener(tabId, {status:"complete"}, null);
 		return;
 	}
 	var timeout = localStorage['loadtimeout'+preset];
@@ -480,10 +479,11 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 			return;
 		if (response.findresult == "yes") {
 			// notification & tab handling
-			tabs[tabId].yes = true;
-			if (localStorage['onetimecheck'+preset] == 'true')
+			if (localStorage['onetimecheck'+preset] == 'false') {
+				tabs[tabId].yes = true;
 				reload_cancel(tabId, 'yes');
-			if (localStorage['notifcheck'+preset] == 'true')
+			}
+			if (localStorage['notifcheck'+preset] == 'false')
 			{
 				chrome.tabs.get(tabId, function (tab) {
 					chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
@@ -502,14 +502,28 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 					});
 				});
 			}
-			if (localStorage['reloadcheck'+preset] == 'true') {
-				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-				updateTab(tabId, preset, tab_url);
-			}
 		}
 		});
 	}
 });
+
+function pause_sound_with_fadeout(sound) {
+	if (!sound) return;
+	var volume = sound.volume;
+	volume_fadeout_timer = setInterval(function() {
+		if (volume > 0) {
+			volume -= 0.05;
+			sound.volume = Math.max(volume, 0);
+		} else {
+			clearInterval(volume_fadeout_timer);
+			sound.pause();
+		}
+	}, 16)
+}
+
+function pause_sound() {
+	pause_sound_with_fadeout(sound_elem);
+}
 
 function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 	var action = (pmpattern == 'B') ? 'Lost' : 'Found';
@@ -534,8 +548,8 @@ function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 		}
 	);
 	notification.onclick = function() {
-			onclick && onclick();
-			pause_sound();
+		onclick && onclick();
+		pause_sound();
 	};
 	notification.onclose = pause_sound;
 
@@ -558,13 +572,9 @@ function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 		}
 	}
 
-	function pause_sound() {
-		pause_sound_with_fadeout(sound_elem);
-	}
-
 	var sound_elem = document.getElementById("sound_elem");
 	//var pause_sound = sound_elem.pause.bind(sound_elem);
-	if (sound_file) {
+	if (sound_file && sound_elem.paused) {
 		sound_elem.src = sound_file;
 		sound_elem.loop = (localStorage['pm_sound_til'+preset] != 'sound');
 		sound_elem.play();
@@ -573,20 +583,6 @@ function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 			setTimeout(pause_sound, localStorage['pm_sound_timeout'+preset]*1000 || 5000);
 		}
 	}
-}
-
-function pause_sound_with_fadeout(sound) {
-	if (!sound) return;
-	var volume = sound.volume;
-	volume_fadeout_timer = setInterval(function() {
-		if (volume > 0) {
-			volume -= 0.05;
-			sound.volume = Math.max(volume, 0);
-		} else {
-			clearInterval(volume_fadeout_timer);
-			sound.pause();
-		}
-	}, 16)
 }
 
 function reload_it(tabId, tab_url) {
@@ -600,9 +596,9 @@ function reload_it(tabId, tab_url) {
 			tabs[tabId].init = false;
 			return;
 		}
-		if (tabs[tabId].yes)
+		if (tabs[tabId].yes && tabs[tabId].endpreset)
 		{
-			if (tabs[tabId].endpreset && tabs[tabId].endpreset.length > tabs[tabId].count)
+			if (tabs[tabId].endpreset.length > tabs[tabId].count)
 			{
 				next_preset(tabId, tabs[tabId].endpreset[tabs[tabId].count]);
 				tabs[tabId].count++;
@@ -632,10 +628,11 @@ function reload_it(tabId, tab_url) {
 		}
 		if (response.findresult == "yes") {
 			// notification & tab handling
-			tabs[tabId].yes = true;
-			if (localStorage['onetimecheck'+preset] == 'true')
+			if (localStorage['onetimecheck'+preset] == 'false') {
+				tabs[tabId].yes = true;
 				reload_cancel(tabId, 'yes');
-			if (localStorage['notifcheck'+preset] == 'true')
+			}
+			if (localStorage['notifcheck'+preset] == 'false')
 			{
 				chrome.tabs.get(tabId, function (tab) {
 					chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
@@ -654,18 +651,16 @@ function reload_it(tabId, tab_url) {
 					});
 				});
 			}
-			if (localStorage['reloadcheck'+preset] == 'true') {
-				chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-				updateTab(tabId, preset, tab_url);
-			}
+			if (localStorage['reloadcheck'+preset] == 'false')
+				return;
 		} else if (response.findresult == "skip") {
 			chrome.browserAction.setBadgeText({text:'skip', tabId:tabId});
 			if (localStorage['skiptimeout'+preset] > 0 && !tabs[tabId].ltimeout)
 				tabs[tabId].ltimeout = setTimeout(updateTab, localStorage['skiptimeout'+preset], tabId, preset, tab_url);
-		} else {
-			chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-			updateTab(tabId, preset, tab_url);
-		}
+			return;
+		} 
+		chrome.browserAction.setBadgeText({text:'', tabId:tabId});
+		updateTab(tabId, preset, tab_url);
 		});
 	} else {
 		chrome.browserAction.setBadgeText({text:'', tabId:tabId});
