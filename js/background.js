@@ -149,7 +149,6 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].urlChanged = true;
 		tabs[currentTabId].ltimeout = null;
 		tabs[currentTabId].yes = false;
-		tabs[currentTabId].count = 0;
 		tabs[currentTabId].cachetime = 0;
 		tabs[currentTabId].endpreset = null;
 		tabs[currentTabId].init = true;
@@ -231,45 +230,24 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 	});
 }
 
-function next_preset(tabId, preset)
+function next_preset(tabId)
 {
-	tabs[tabId].yes = false;
-	tabs[tabId].preset = preset;
-	if (localStorage['random_time'+preset] == 'true')
-		tabs[tabId].time_type = 'rand';
-		//todo: make defaults for random values
-	else {
+	if (tabs[tabId].endpreset && tabs[tabId].endpreset.length > 0) {
+		var preset = tabs[tabId].endpreset[0];
+		var checkme = localStorage['dpattern'+preset];
+		var page_monitor_pattern = 'A';
+		if (!checkme) {
+			checkme = localStorage['dpattern1'+preset];
+			page_monitor_pattern = 'B';
+		}
 		var interval_time = localStorage['default_time'+preset] * 1000;
-		tabs[tabId].interval_time = interval_time;
-		if (interval_time == 0)
-			interval_time = 1;
-		tabs[tabId].time_between_load = interval_time;
+		if (!localStorage['default_time'+preset])
+			interval_time = 5000;
+		loop_start(preset, -1, interval_time, 'custom', checkme, page_monitor_pattern, localStorage['pdurl'+preset],
+					localStorage['pselector'+preset], localStorage['ptext'+preset],
+					localStorage['pskip'+preset], localStorage['ptimeout'+preset],
+					localStorage['pnrepeats'+preset], localStorage['pvalue'+preset]);
 	}
-
-	if (localStorage['pdcheck'+preset] == 'true') {
-		tabs[tabId].predefined_url = localStorage['pdurl'+preset];
-		tabs[tabId].action_url = localStorage['pdurl'+preset];
-	}
-	if (localStorage['dpattern'+preset]) {
-		tabs[tabId].checkme = localStorage['dpattern'+preset];
-		tabs[tabId].pmpattern = 'A';
-	} else if (localStorage['dpattern1'+preset]) {
-		tabs[tabId].checkme = localStorage['dpattern1'+preset];
-		tabs[tabId].pmpattern = 'B';
-	}
-	if (localStorage['pselector'+preset])
-	{
-		tabs[tabId].bquery = localStorage['pselector'+preset];
-		tabs[tabId].btext = localStorage['ptext'+preset];
-		tabs[tabId].bskip = localStorage['pskip'+preset];
-		tabs[tabId].btimeout = localStorage['ptimeout'+preset];
-		tabs[tabId].bnrepeats = localStorage['pnrepeats'+preset];
-		tabs[tabId].bvalue = localStorage['pvalue'+preset];
-	}
-	tabs[tabId].itimer = 1;
-	tabs[tabId].wait_time = 0;
-	tabs[tabId].wait_next_round = 0;
-	real_start(tabId, tabs[tabId].action_url);
 }
 
 function loop_stop() {
@@ -500,6 +478,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 					});
 				});
 			}
+			setTimeout(function(){next_preset(tabId)}, localStorage['presettimeout'+preset]);
 		}
 		});
 	}
@@ -599,18 +578,6 @@ function reload_it(tabId, tab_url) {
 		chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 		updateTab(tabId, preset, tab_url);
 		tabs[tabId].init = false;
-		return;
-	}
-	if (tabs[tabId].yes && tabs[tabId].endpreset) {
-		if (tabs[tabId].endpreset.length > tabs[tabId].count)
-		{
-			next_preset(tabId, tabs[tabId].endpreset[tabs[tabId].count]);
-			tabs[tabId].count++;
-			if (localStorage['loopbackcheck'+preset] == 'true' &&
-					tabs[tabId].endpreset.length == tabs[tabId].count)
-				tabs[tabId].count = 0;
-		} else
-			reload_cancel(tabId, 'yes');
 		return;
 	}
 	tabs[tabId].yes = false;

@@ -39,7 +39,6 @@ function save_options(){
 	localStorage['dpattern1'+preset] = getId('defaultPattern1').value;
 	localStorage['ipattern'+preset] = getId('ignorepattern').value;
 	localStorage['npreset'+preset] = getId('next_preset').value;
-	localStorage['loopbackcheck'+preset] = getId('loopbackcheck').checked
 	localStorage['onetimecheck'+preset] = getId('onetimecheck').checked
 	localStorage['notifcheck'+preset] = getId('notifcheck').checked
 	localStorage['reloadcheck'+preset] = getId('reloadcheck').checked
@@ -88,6 +87,7 @@ function save_options(){
 	localStorage['cachereloadinterv'+preset] = getId('cachereloadinterv').value;
 	localStorage['loadtimeout'+preset] = getId('loadtimeout').value;
 	localStorage['skiptimeout'+preset] = getId('skiptimeout').value;
+	localStorage['presettimeout'+preset] = getId('presettimeout').value;
 
 	localStorage.support = !(getId('dontsupport').checked);
 }
@@ -103,7 +103,6 @@ function read_options(){
  	getId('pmonitor').checked  = (localStorage['pmonitor'+preset] == 'true');
  	getId('timercheck').checked  = (localStorage['timercheck'+preset] == 'true');
  	getId('actioncheck').checked  = (localStorage['actioncheck'+preset] == 'true');
- 	getId('loopbackcheck').checked  = (localStorage['loopbackcheck'+preset] == 'true');
  	getId('onetimecheck').checked  = (localStorage['onetimecheck'+preset] == 'true');
  	getId('notifcheck').checked  = (localStorage['notifcheck'+preset] == 'true');
  	getId('reloadcheck').checked  = (localStorage['reloadcheck'+preset] == 'true');
@@ -170,6 +169,7 @@ function read_options(){
 	getId('cachereloadinterv').value = localStorage['cachereloadinterv'+preset] || -1;
 	getId('loadtimeout').value = localStorage['loadtimeout'+preset] || 0;
 	getId('skiptimeout').value = localStorage['skiptimeout'+preset] || 0;
+	getId('presettimeout').value = localStorage['presettimeout'+preset] || 0;
 
 	getId('dontsupport').checked = (localStorage.support == 'false');
 }
