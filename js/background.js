@@ -153,6 +153,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 		tabs[currentTabId].cachetime = 0;
 		tabs[currentTabId].endpreset = null;
 		tabs[currentTabId].init = true;
+		tabs[currentTabId].findresult = null;
 		tabs[currentTabId].request_status = 0;
 		var npreset = localStorage['npreset'+preset];
 		if (npreset)
@@ -455,8 +456,6 @@ chrome.notifications.onClosed.addListener(function (id) {
 chrome.runtime.onMessage.addListener((message, sender) => {
 	if (message.type === 'pageLoad') {
 		const tabId = sender.tab.id;
-		//console.log(`Tab ${tabId} loaded with status: ${message.status}`);
-		//console.log(tabs);
 		if (isEmpty(tabs[tabId]))
 			return;
 		var check_content = tabs[tabId].checkme;
@@ -477,14 +476,13 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 			function(response) {
 		if (chrome.runtime.lastError)
 			return;
-		if (response.findresult == "yes") {
+		tabs[tabId].findresult = response.findresult;
+		if (response.findresult == "yes" && !tabs[tabId].yes) {
 			// notification & tab handling
-			if (localStorage['onetimecheck'+preset] == 'false') {
-				tabs[tabId].yes = true;
+			tabs[tabId].yes = true;
+			if (localStorage['onetimecheck'+preset] == 'false')
 				reload_cancel(tabId, 'yes');
-			}
-			if (localStorage['notifcheck'+preset] == 'false')
-			{
+			if (localStorage['notifcheck'+preset] == 'false') {
 				chrome.tabs.get(tabId, function (tab) {
 					chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
 						// draw attention to target window if it's not focused inside Chrome
@@ -597,84 +595,35 @@ function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 function reload_it(tabId, tab_url) {
 	var check_content = tabs[tabId].checkme;
 	var preset = tabs[tabId].preset;
-	if (check_content) {
-		if (tabs[tabId].init)
-		{
-			chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-			updateTab(tabId, preset, tab_url);
-			tabs[tabId].init = false;
-			return;
-		}
-		if (tabs[tabId].yes && tabs[tabId].endpreset)
-		{
-			if (tabs[tabId].endpreset.length > tabs[tabId].count)
-			{
-				next_preset(tabId, tabs[tabId].endpreset[tabs[tabId].count]);
-				tabs[tabId].count++;
-				if (localStorage['loopbackcheck'+preset] == 'true' &&
-						tabs[tabId].endpreset.length == tabs[tabId].count)
-					tabs[tabId].count = 0;
-			} else
-				reload_cancel(tabId, 'yes');
-			return;
-		}
-		var pmpattern = tabs[tabId].pmpattern;
-		var bquery = tabs[tabId].bquery;
-		var btext = tabs[tabId].btext;
-		var bskip = tabs[tabId].bskip;
-		var btimeout = tabs[tabId].btimeout;
-		var bnrepeats = tabs[tabId].bnrepeats;
-		var bvalue = tabs[tabId].bvalue;
-		var ipattern = localStorage['ipattern'+preset];
-		chrome.tabs.sendMessage(tabId,
-			{checkme: check_content, pattern: pmpattern, query: bquery, text: btext, skip: bskip,
-			timeout: btimeout, repeat: bnrepeats, value: bvalue, pipattern: ipattern},
-			function(response) {
-		if (chrome.runtime.lastError)
-		{
-			updateTab(tabId, preset, tab_url);
-			return;
-		}
-		if (response.findresult == "yes") {
-			// notification & tab handling
-			if (localStorage['onetimecheck'+preset] == 'false') {
-				tabs[tabId].yes = true;
-				reload_cancel(tabId, 'yes');
-			}
-			if (localStorage['notifcheck'+preset] == 'false')
-			{
-				chrome.tabs.get(tabId, function (tab) {
-					chrome.windows.getLastFocused({}, function (lastFocusedWindow) {
-						// draw attention to target window if it's not focused inside Chrome
-						// (or not focused at all) and switch to the target tab
-						if (lastFocusedWindow.id != tab.windowId || !lastFocusedWindow.focused) {
-							chrome.windows.update(tab.windowId, {drawAttention: true});
-							chrome.tabs.update(tabId, {active: true});
-						}
-						// show notification box
-						show_notification(tabId, preset, pmpattern, check_content, function () {
-							// switch to target tab & its window upon clicking the box
-							chrome.tabs.update(tabId, {active: true});
-							chrome.windows.update(tab.windowId, {focused: true});
-						});
-					});
-				});
-			}
-			if (localStorage['reloadcheck'+preset] == 'false')
-				return;
-		} else if (response.findresult == "skip") {
-			chrome.browserAction.setBadgeText({text:'skip', tabId:tabId});
-			if (localStorage['skiptimeout'+preset] > 0 && !tabs[tabId].ltimeout)
-				tabs[tabId].ltimeout = setTimeout(updateTab, localStorage['skiptimeout'+preset], tabId, preset, tab_url);
-			return;
-		}
+	if (tabs[tabId].init) {
 		chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 		updateTab(tabId, preset, tab_url);
-		});
-	} else {
-		chrome.browserAction.setBadgeText({text:'', tabId:tabId});
-		updateTab(tabId, preset, tab_url);
+		tabs[tabId].init = false;
+		return;
 	}
+	if (tabs[tabId].yes && tabs[tabId].endpreset) {
+		if (tabs[tabId].endpreset.length > tabs[tabId].count)
+		{
+			next_preset(tabId, tabs[tabId].endpreset[tabs[tabId].count]);
+			tabs[tabId].count++;
+			if (localStorage['loopbackcheck'+preset] == 'true' &&
+					tabs[tabId].endpreset.length == tabs[tabId].count)
+				tabs[tabId].count = 0;
+		} else
+			reload_cancel(tabId, 'yes');
+		return;
+	}
+	tabs[tabId].yes = false;
+	if (tabs[tabId].findresult && tabs[tabId].findresult == "skip") {
+		chrome.browserAction.setBadgeText({text:'skip', tabId:tabId});
+		if (localStorage['skiptimeout'+preset] > 0 && !tabs[tabId].ltimeout)
+			tabs[tabId].ltimeout = setTimeout(updateTab, localStorage['skiptimeout'+preset], tabId, preset, tab_url);
+		return;
+	}
+	if (localStorage['reloadcheck'+preset] == 'true')
+		return;
+	chrome.browserAction.setBadgeText({text:'', tabId:tabId});
+	updateTab(tabId, preset, tab_url);
 }
 
 function reload_cancel(tabId, content_detect) {
