@@ -30,7 +30,7 @@ chrome.extension.onConnect.addListener(function(port) {
 });
 
 function wildTest(wildcard, str) {
-	let w = wildcard.replace(/[.+^${}()|[\]\\]/g, '\\$&'); // regexp escape 
+	let w = wildcard.replace(/[.+^${}()|[\]\\]/g, '\\$&'); // regexp escape
 	const re = new RegExp(`^${w.replace(/\*/g,'.*').replace(/\?/g,'.')}$`,'i');
 	return re.test(str); // remove last 'i' above to have case sensitive
 }
@@ -507,8 +507,10 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 	}
 });
 
+var playing = false;
+
 function pause_sound_with_fadeout(sound) {
-	if (!sound) return;
+	if (!sound || !playing || sound.paused) return;
 	var volume = sound.volume;
 	volume_fadeout_timer = setInterval(function() {
 		if (volume > 0) {
@@ -517,6 +519,7 @@ function pause_sound_with_fadeout(sound) {
 		} else {
 			clearInterval(volume_fadeout_timer);
 			sound.pause();
+			playing = false;
 		}
 	}, 16)
 }
@@ -539,7 +542,7 @@ function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 	  buttons: [{title: "Show tab"}, {title: "Dismiss"}],
 	  isClickable: true
 	}
-	
+
 	var notification = new Notification(
 		options.title,
 		{
@@ -547,12 +550,6 @@ function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 			icon: "Icon/icon-128.png"
 		}
 	);
-	notification.onclick = function() {
-		onclick && onclick();
-		pause_sound();
-	};
-	notification.onclose = pause_sound;
-
 	var sound_file = '';
 	if(localStorage['sound'+preset] && localStorage['sound'+preset] == '2') {
 		sound_file = './sound/sound1.mp3';
@@ -574,14 +571,26 @@ function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 
 	var sound_elem = document.getElementById("sound_elem");
 	//var pause_sound = sound_elem.pause.bind(sound_elem);
-	if (sound_file && sound_elem.paused) {
+	if (sound_file && !playing && sound_elem.paused) {
+		playing = true;
 		sound_elem.src = sound_file;
 		sound_elem.loop = (localStorage['pm_sound_til'+preset] != 'sound');
-		sound_elem.play();
 		sound_elem.volume = localStorage['soundvolume'+preset];
-		if (localStorage['pm_sound_til'+preset] == 'timeout') {
-			setTimeout(pause_sound, localStorage['pm_sound_timeout'+preset]*1000 || 5000);
-		}
+		sound_elem.addEventListener('ended', function() {
+			playing = false;
+		});
+		const playpromise = sound_elem.play();
+		sound_elem.onplaying = function() {
+			playpromise.then(_ => {
+				if (localStorage['pm_sound_til'+preset] == 'timeout')
+					setTimeout(pause_sound, localStorage['pm_sound_timeout'+preset]*1000 || 5000);
+				notification.onclick = function() {
+					onclick && onclick();
+					pause_sound();
+				};
+				notification.onclose = pause_sound;
+			})
+		};
 	}
 }
 
@@ -658,7 +667,7 @@ function reload_it(tabId, tab_url) {
 			if (localStorage['skiptimeout'+preset] > 0 && !tabs[tabId].ltimeout)
 				tabs[tabId].ltimeout = setTimeout(updateTab, localStorage['skiptimeout'+preset], tabId, preset, tab_url);
 			return;
-		} 
+		}
 		chrome.browserAction.setBadgeText({text:'', tabId:tabId});
 		updateTab(tabId, preset, tab_url);
 		});
