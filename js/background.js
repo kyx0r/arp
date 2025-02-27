@@ -131,7 +131,7 @@ function get_rand_time(tmin, tmax) {
 	var rand_time = Math.round(Math.random()*(tmax-tmin-0)) + (tmin - 0);
 	return rand_time;
 }
-function _loop_start(currentTabId, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
+function _loop_start(currentTabId, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url, cur_url,
 			bquery, btext, bskip, btimeout, bnrepeats, bvalue)
 {
 	//For restore scroll bar
@@ -159,7 +159,7 @@ function _loop_start(currentTabId, preset, waitTime, interval_time, interval_typ
 		tabs[currentTabId].pre_url = predefined_url;
 		tabs[currentTabId].action_url = predefined_url;
 	} else {
-		tabs[currentTabId].action_url = tab.url;
+		tabs[currentTabId].action_url = cur_url;
 	}
 
 	if(bquery) {
@@ -227,7 +227,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 			bquery, btext, bskip, btimeout, bnrepeats, bvalue) {
 
 	getCurrentTab( function(tab) {
-		_loop_start(tab.id, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
+		_loop_start(tab.id, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url, tab.url,
 			bquery, btext, bskip, btimeout, bnrepeats, bvalue);
 	});
 }
@@ -245,10 +245,7 @@ function next_preset(tabId)
 		var interval_time = localStorage['default_time'+preset] * 1000;
 		if (!localStorage['default_time'+preset])
 			interval_time = 5000;
-		var predefined_url = tabs[tabId].action_url;
-		if (localStorage['pdurl'+preset])
-			predefined_url = localStorage['pdurl'+preset];
-		_loop_start(tabId, preset, -1, interval_time, 'custom', checkme, page_monitor_pattern, predefined_url,
+		_loop_start(tabId, preset, -1, interval_time, 'custom', checkme, page_monitor_pattern, localStorage['pdurl'+preset], tabs[tabId].action_url,
 					localStorage['pselector'+preset], localStorage['ptext'+preset],
 					localStorage['pskip'+preset], localStorage['ptimeout'+preset],
 					localStorage['pnrepeats'+preset], localStorage['pvalue'+preset]);
@@ -494,10 +491,8 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 	}
 });
 
-var playing = false;
-
 function pause_sound_with_fadeout(sound) {
-	if (!sound || !playing || sound.paused) return;
+	if (!sound || sound.paused) return;
 	var volume = sound.volume;
 	volume_fadeout_timer = setInterval(function() {
 		if (volume > 0) {
@@ -506,13 +501,8 @@ function pause_sound_with_fadeout(sound) {
 		} else {
 			clearInterval(volume_fadeout_timer);
 			sound.pause();
-			playing = false;
 		}
 	}, 16)
-}
-
-function pause_sound() {
-	pause_sound_with_fadeout(sound_elem);
 }
 
 function show_notification(tabId, preset, pmpattern, check_content, onclick) {
@@ -556,28 +546,27 @@ function show_notification(tabId, preset, pmpattern, check_content, onclick) {
 		}
 	}
 
-	var sound_elem = document.getElementById("sound_elem");
-	//var pause_sound = sound_elem.pause.bind(sound_elem);
-	if (sound_file && !playing && sound_elem.paused) {
-		playing = true;
+	var sound_elem = null;
+	if (sound_file) {
+		var _sound_elem = document.getElementById("sound_elem");
+		sound_elem = _sound_elem.cloneNode(true);
 		sound_elem.src = sound_file;
 		sound_elem.loop = (localStorage['pm_sound_til'+preset] != 'sound');
 		sound_elem.volume = localStorage['soundvolume'+preset];
-		sound_elem.addEventListener('ended', function() {
-			playing = false;
-		});
 		const playpromise = sound_elem.play();
 		sound_elem.onplaying = function() {
 			playpromise.then(_ => {
 				if (localStorage['pm_sound_til'+preset] == 'timeout')
-					setTimeout(pause_sound, localStorage['pm_sound_timeout'+preset]*1000 || 5000);
-				notification.onclick = function() {
-					onclick && onclick();
-					pause_sound();
-				};
-				notification.onclose = pause_sound;
+					setTimeout(notification.onclose, localStorage['pm_sound_timeout'+preset]*1000 || 5000);
 			})
 		};
+	}
+	notification.onclick = function() {
+		onclick && onclick();
+		pause_sound_with_fadeout(sound_elem);
+	};
+	notification.onclose = function() {
+		pause_sound_with_fadeout(sound_elem);
 	}
 }
 
