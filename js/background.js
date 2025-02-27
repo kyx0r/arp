@@ -131,7 +131,7 @@ function get_rand_time(tmin, tmax) {
 	var rand_time = Math.round(Math.random()*(tmax-tmin-0)) + (tmin - 0);
 	return rand_time;
 }
-function _loop_start(currentTabId, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url, cur_url,
+function _loop_start(tab, currentTabId, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
 			bquery, btext, bskip, btimeout, bnrepeats, bvalue)
 {
 	//For restore scroll bar
@@ -139,6 +139,7 @@ function _loop_start(currentTabId, preset, waitTime, interval_time, interval_typ
 	if (tabs[currentTabId])
 		reload_cancel(currentTabId, "no");
 	tabs[currentTabId] = new Array();
+	tabs[currentTabId].tab = tab;
 	tabs[currentTabId].preset = preset;
 	tabs[currentTabId].urlChanged = true;
 	tabs[currentTabId].ltimeout = null;
@@ -159,7 +160,7 @@ function _loop_start(currentTabId, preset, waitTime, interval_time, interval_typ
 		tabs[currentTabId].pre_url = predefined_url;
 		tabs[currentTabId].action_url = predefined_url;
 	} else {
-		tabs[currentTabId].action_url = cur_url;
+		tabs[currentTabId].action_url = tab.url;
 	}
 
 	if(bquery) {
@@ -227,7 +228,7 @@ function loop_start(preset, waitTime, interval_time, interval_type, checkme, pag
 			bquery, btext, bskip, btimeout, bnrepeats, bvalue) {
 
 	getCurrentTab( function(tab) {
-		_loop_start(tab.id, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url, tab.url,
+		_loop_start(tab, tab.id, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
 			bquery, btext, bskip, btimeout, bnrepeats, bvalue);
 	});
 }
@@ -245,7 +246,7 @@ function next_preset(tabId)
 		var interval_time = localStorage['default_time'+preset] * 1000;
 		if (!localStorage['default_time'+preset])
 			interval_time = 5000;
-		_loop_start(tabId, preset, -1, interval_time, 'custom', checkme, page_monitor_pattern, localStorage['pdurl'+preset], tabs[tabId].action_url,
+		_loop_start(tabs[tabId].tab, tabId, preset, -1, interval_time, 'custom', checkme, page_monitor_pattern, localStorage['pdurl'+preset],
 					localStorage['pselector'+preset], localStorage['ptext'+preset],
 					localStorage['pskip'+preset], localStorage['ptimeout'+preset],
 					localStorage['pnrepeats'+preset], localStorage['pvalue'+preset]);
@@ -269,7 +270,7 @@ function onUpdateListener(tabId, changeInfo, tab) {
 	if (tabIsReloaderActive) {
 		if (changeInfo['status'] === 'loading') {
 			urlChanged=changeInfo['url'] || false;
-			if(tabs[tabId].pre_url) {
+			if (tabs[tabId].pre_url) {
 				tabs[tabId].action_url = tabs[tabId].pre_url;
 			} else if (urlChanged) {
 				tabs[tabId].action_url = urlChanged;
@@ -278,13 +279,12 @@ function onUpdateListener(tabId, changeInfo, tab) {
 				urlChanged = true;
 			tabs[tabId].urlChanged = urlChanged;
 		} else if (changeInfo['status'] === 'complete') {
-			if(tabs[tabId].time_type == 'rand') {
+			if (tabs[tabId].time_type == 'rand') {
 				var min_max_arr = tabs[tabId].interval_time.split("-");
 				var interval_time_tmp = get_rand_time(min_max_arr[0], min_max_arr[1]);
 				tabs[tabId].time_between_load = interval_time_tmp * 1000;
 			}
-			if (tabs[tabId].ltimeout)
-			{
+			if (tabs[tabId].ltimeout) {
 				clearTimeout(tabs[tabId].ltimeout);
 				tabs[tabId].ltimeout = null;
 			}
@@ -296,9 +296,9 @@ function onUpdateListener(tabId, changeInfo, tab) {
 			setupReloadTimer(tabId);
 			stopBadgeTimer(tabId);
 			tabs[tabId].displayTimer = window.setInterval(function(tabId) {
-					tabs[tabId].next_round--;
-					setTheBadgeText(tabId);
-				}, 1000, tabId);
+				tabs[tabId].next_round--;
+				setTheBadgeText(tabId);
+			}, 1000, tabId);
 		}
 	}
 }
@@ -444,7 +444,8 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 			return;
 		var check_content = tabs[tabId].checkme;
 		var preset = tabs[tabId].preset;
-		if (!check_content || tabs[tabId].yes)
+		var tabIsReloaderActive = (tabs[tabId] || false) && (tabs[tabId].status == 'start' || false) && (tabs[tabId].time_between_load > 0 || false);
+		if (!check_content || !tabIsReloaderActive || tabs[tabId].yes)
 			return;
 		var pmpattern = tabs[tabId].pmpattern;
 		var bquery = tabs[tabId].bquery;
