@@ -131,102 +131,104 @@ function get_rand_time(tmin, tmax) {
 	var rand_time = Math.round(Math.random()*(tmax-tmin-0)) + (tmin - 0);
 	return rand_time;
 }
+function _loop_start(currentTabId, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
+			bquery, btext, bskip, btimeout, bnrepeats, bvalue)
+{
+	//For restore scroll bar
+	chrome.tabs.sendMessage(currentTabId, {pattern: "C"}, null);
+	if (tabs[currentTabId])
+		reload_cancel(currentTabId, "no");
+	tabs[currentTabId] = new Array();
+	tabs[currentTabId].preset = preset;
+	tabs[currentTabId].urlChanged = true;
+	tabs[currentTabId].ltimeout = null;
+	tabs[currentTabId].yes = false;
+	tabs[currentTabId].cachetime = 0;
+	tabs[currentTabId].endpreset = null;
+	tabs[currentTabId].init = true;
+	tabs[currentTabId].nextp_timer = null;
+	tabs[currentTabId].findresult = null;
+	tabs[currentTabId].request_status = 0;
+	var npreset = localStorage['npreset'+preset];
+	if (npreset)
+		tabs[currentTabId].endpreset = npreset.split(',');
+
+	if (typeof localStorage['soundvolume'+preset] == 'undefined')
+		localStorage['soundvolume'+preset] = 1;
+	if(predefined_url) {
+		tabs[currentTabId].pre_url = predefined_url;
+		tabs[currentTabId].action_url = predefined_url;
+	} else {
+		tabs[currentTabId].action_url = tab.url;
+	}
+
+	if(bquery) {
+		tabs[currentTabId].bquery = bquery;
+		tabs[currentTabId].btext = btext;
+		tabs[currentTabId].bskip = bskip;
+		tabs[currentTabId].btimeout = btimeout;
+		tabs[currentTabId].bnrepeats = bnrepeats;
+		tabs[currentTabId].bvalue = bvalue;
+	}
+	tabs[currentTabId].interval_time = interval_time;
+	if(interval_type == 'rand') {
+		var min_max_arr = interval_time.split("-");
+		var interval_time_tmp = get_rand_time(min_max_arr[0], min_max_arr[1]);
+		tabs[currentTabId].time_between_load = interval_time_tmp * 1000;
+	} else {
+		if (interval_time == 0)
+			interval_time = 1;
+		tabs[currentTabId].time_between_load = interval_time;
+	}
+	tabs[currentTabId].time_type = interval_type;
+	tabs[currentTabId].next_round = tabs[currentTabId].time_between_load / 1000;
+	if(checkme) {
+		tabs[currentTabId].checkme = checkme;
+	}
+	if(page_monitor_pattern) {
+		tabs[currentTabId].pmpattern = page_monitor_pattern;
+	}
+
+	var the_action_url = tabs[currentTabId].action_url;
+	if(waitTime == -1) {
+		tabs[currentTabId].status = 'start';
+		tabs[currentTabId].wait_time = 0;
+		tabs[currentTabId].wait_next_round = 0;
+
+		if(tabs[currentTabId].displayTimer) {
+			stopBadgeTimer(currentTabId);
+		}
+		real_start(currentTabId, the_action_url);
+	} else {
+		tabs[currentTabId].wait_time = waitTime;
+		var timeDelay = 0;
+
+		//Timer mode 2
+		if(waitTime.toString().search(" ") > 0) {
+			tabs[currentTabId].status = 'wait';
+			timeDelay = (new Date(waitTime)).getTime() - (new Date()).getTime();
+			tabs[currentTabId].wait_next_round = Math.floor(timeDelay/1000);
+		//Timer mode 1
+		} else {
+			tabs[currentTabId].status = 'wait';
+			timeDelay = waitTime;
+			tabs[currentTabId].wait_next_round = waitTime/1000;
+		}
+
+		tabs[currentTabId].displayTimer = window.setInterval(function(tabId) {
+			tabs[tabId].wait_next_round--;
+			setTimerBadgeText(tabId);
+		}, 1000, currentTabId);
+		setTimeout(function(){real_start(currentTabId, the_action_url)}, timeDelay);
+	}
+}
 
 function loop_start(preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
 			bquery, btext, bskip, btimeout, bnrepeats, bvalue) {
 
 	getCurrentTab( function(tab) {
-		var currentTabId = tab.id;
-
-		//For restore scroll bar
-		chrome.tabs.sendMessage(currentTabId, {pattern: "C"}, null);
-		if (tabs[currentTabId]) {
-			reload_cancel(tab.id, "no");
-		}
-
-		tabs[currentTabId] = new Array();
-		tabs[currentTabId].preset = preset;
-		tabs[currentTabId].urlChanged = true;
-		tabs[currentTabId].ltimeout = null;
-		tabs[currentTabId].yes = false;
-		tabs[currentTabId].cachetime = 0;
-		tabs[currentTabId].endpreset = null;
-		tabs[currentTabId].init = true;
-		tabs[currentTabId].findresult = null;
-		tabs[currentTabId].request_status = 0;
-		var npreset = localStorage['npreset'+preset];
-		if (npreset)
-			tabs[currentTabId].endpreset = npreset.split(',');
-
-		if (typeof localStorage['soundvolume'+preset] == 'undefined')
-			localStorage['soundvolume'+preset] = 1;
-		if(predefined_url) {
-			tabs[currentTabId].pre_url = predefined_url;
-			tabs[currentTabId].action_url = predefined_url;
-		} else {
-			tabs[currentTabId].action_url = tab.url;
-		}
-
-		if(bquery)
-		{
-			tabs[currentTabId].bquery = bquery;
-			tabs[currentTabId].btext = btext;
-			tabs[currentTabId].bskip = bskip;
-			tabs[currentTabId].btimeout = btimeout;
-			tabs[currentTabId].bnrepeats = bnrepeats;
-			tabs[currentTabId].bvalue = bvalue;
-		}
-		tabs[currentTabId].interval_time = interval_time;
-		if(interval_type == 'rand') {
-			var min_max_arr = interval_time.split("-");
-			var interval_time_tmp = get_rand_time(min_max_arr[0], min_max_arr[1]);
-			tabs[currentTabId].time_between_load = interval_time_tmp * 1000;
-		} else {
-			if (interval_time == 0)
-				interval_time = 1;
-			tabs[currentTabId].time_between_load = interval_time;
-		}
-		tabs[currentTabId].time_type = interval_type;
-		tabs[currentTabId].next_round = tabs[currentTabId].time_between_load / 1000;
-		if(checkme) {
-			tabs[currentTabId].checkme = checkme;
-		}
-		if(page_monitor_pattern) {
-			tabs[currentTabId].pmpattern = page_monitor_pattern;
-		}
-
-		var the_action_url = tabs[currentTabId].action_url;
-		if(waitTime == -1) {
-			tabs[currentTabId].status = 'start';
-			tabs[currentTabId].wait_time = 0;
-			tabs[currentTabId].wait_next_round = 0;
-
-			if(tabs[currentTabId].displayTimer) {
-				stopBadgeTimer(currentTabId);
-			}
-			real_start(currentTabId, the_action_url);
-		} else {
-			tabs[currentTabId].wait_time = waitTime;
-			var timeDelay = 0;
-
-			//Timer mode 2
-			if(waitTime.toString().search(" ") > 0) {
-				tabs[currentTabId].status = 'wait';
-				timeDelay = (new Date(waitTime)).getTime() - (new Date()).getTime();
-				tabs[currentTabId].wait_next_round = Math.floor(timeDelay/1000);
-			//Timer mode 1
-			} else {
-				tabs[currentTabId].status = 'wait';
-				timeDelay = waitTime;
-				tabs[currentTabId].wait_next_round = waitTime/1000;
-			}
-
-			tabs[currentTabId].displayTimer = window.setInterval(function(tabId) {
-				tabs[tabId].wait_next_round--;
-				setTimerBadgeText(tabId);
-			}, 1000, currentTabId);
-			setTimeout(function(){real_start(currentTabId, the_action_url)}, timeDelay);
-		}
+		_loop_start(tab.id, preset, waitTime, interval_time, interval_type, checkme, page_monitor_pattern, predefined_url,
+			bquery, btext, bskip, btimeout, bnrepeats, bvalue);
 	});
 }
 
@@ -243,7 +245,10 @@ function next_preset(tabId)
 		var interval_time = localStorage['default_time'+preset] * 1000;
 		if (!localStorage['default_time'+preset])
 			interval_time = 5000;
-		loop_start(preset, -1, interval_time, 'custom', checkme, page_monitor_pattern, localStorage['pdurl'+preset],
+		var predefined_url = tabs[tabId].action_url;
+		if (localStorage['pdurl'+preset])
+			predefined_url = localStorage['pdurl'+preset];
+		_loop_start(tabId, preset, -1, interval_time, 'custom', checkme, page_monitor_pattern, predefined_url,
 					localStorage['pselector'+preset], localStorage['ptext'+preset],
 					localStorage['pskip'+preset], localStorage['ptimeout'+preset],
 					localStorage['pnrepeats'+preset], localStorage['pvalue'+preset]);
@@ -254,6 +259,10 @@ function loop_stop() {
 	getCurrentTab( function(tab) {
 		chrome.tabs.sendMessage(tab.id, {pattern: "D"}, null);
 		reload_cancel(tab.id, "no");
+		if (tabs[tab.id].nextp_timer)
+			clearTimeout(tabs[tab.id].nextp_timer);
+		else
+			tabs[tab.id].nextp_timer = 1;
 	});
 }
 
@@ -359,8 +368,8 @@ function setTimerBadgeText(tabId) {
 
 function setTheBadgeText(tabId) {
 	if (tabs[tabId].next_round < 0) {
-			chrome.browserAction.setBadgeText({text:String(), tabId:tabId});
-			stopBadgeTimer(tabId);
+		chrome.browserAction.setBadgeText({text:String(), tabId:tabId});
+		stopBadgeTimer(tabId);
 	} else {
 		var badgeText = String(tabs[tabId].next_round);
 		var secs = tabs[tabId].next_round%60;
@@ -478,7 +487,8 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 					});
 				});
 			}
-			setTimeout(function(){next_preset(tabId)}, localStorage['presettimeout'+preset]);
+			if (!tabs[tabId].nextp_timer)
+				tabs[tabId].nextp_timer = setTimeout(function(){next_preset(tabId)}, localStorage['presettimeout'+preset]);
 		}
 		});
 	}
@@ -594,7 +604,6 @@ function reload_it(tabId, tab_url) {
 }
 
 function reload_cancel(tabId, content_detect) {
-
 	if (tabs[tabId].reloadTimer) {
 		clearTimeout(tabs[tabId].reloadTimer);
 		tabs[tabId].reloadTimer = null;
