@@ -139,7 +139,6 @@ function _loop_start(tab, currentTabId, preset, waitTime, interval_time, interva
 	if (tabs[currentTabId])
 		reload_cancel(currentTabId, "no");
 	tabs[currentTabId] = new Array();
-	tabs[currentTabId].tab = tab;
 	tabs[currentTabId].preset = preset;
 	tabs[currentTabId].urlChanged = true;
 	tabs[currentTabId].ltimeout = null;
@@ -163,14 +162,16 @@ function _loop_start(tab, currentTabId, preset, waitTime, interval_time, interva
 		tabs[currentTabId].action_url = tab.url;
 	}
 
-	if(bquery) {
+	if (bquery && localStorage['actioncheck'+preset]
+			&& localStorage['actioncheck'+preset] == 'true') {
 		tabs[currentTabId].bquery = bquery;
 		tabs[currentTabId].btext = btext;
 		tabs[currentTabId].bskip = bskip;
 		tabs[currentTabId].btimeout = btimeout;
 		tabs[currentTabId].bnrepeats = bnrepeats;
 		tabs[currentTabId].bvalue = bvalue;
-	}
+	} else
+		tabs[currentTabId].bquery = null;
 	tabs[currentTabId].interval_time = interval_time;
 	if(interval_type == 'rand') {
 		var min_max_arr = interval_time.split("-");
@@ -246,10 +247,14 @@ function next_preset(tabId)
 		var interval_time = localStorage['default_time'+preset] * 1000;
 		if (!localStorage['default_time'+preset])
 			interval_time = 5000;
-		_loop_start(tabs[tabId].tab, tabId, preset, -1, interval_time, 'custom', checkme, page_monitor_pattern, localStorage['pdurl'+preset],
-					localStorage['pselector'+preset], localStorage['ptext'+preset],
-					localStorage['pskip'+preset], localStorage['ptimeout'+preset],
-					localStorage['pnrepeats'+preset], localStorage['pvalue'+preset]);
+		chrome.tabs.get(tabId, function(tab) {
+			if (!tab)
+				return;
+			_loop_start(tab, tabId, preset, -1, interval_time, 'custom', checkme, page_monitor_pattern, localStorage['pdurl'+preset],
+						localStorage['pselector'+preset], localStorage['ptext'+preset],
+						localStorage['pskip'+preset], localStorage['ptimeout'+preset],
+						localStorage['pnrepeats'+preset], localStorage['pvalue'+preset]);
+		});
 	}
 }
 

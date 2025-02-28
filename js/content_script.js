@@ -26,14 +26,12 @@ function rememberPos() {
 }
 
 function sleep(delay) {
-    var start = new Date().getTime();
-	while (new Date().getTime() < start + delay);
+	var start = new Date().getTime();
+		while (new Date().getTime() < start + delay);
 }
 
 function action(query, text, skip, repeat, timeout, value)
 {
-	if (query == undefined)
-		return;
 	var selector = document.querySelectorAll(query);
 	if (text == undefined)
 		text = null;
@@ -48,15 +46,11 @@ function action(query, text, skip, repeat, timeout, value)
 	//console.log(query, text, skip, repeat, timeout, value);
 	//console.log(document.body.innerHTML);
 	for (var i = 0; i < selector.length; i++) {
-		if(selector[i] != null)
-		{
+		if (selector[i] != null) {
 			//console.log(selector[i].innerText);
-			if(i >= skip)
-			{
-				if(text)
-				{
-					if(text.localeCompare(selector[i].innerText) == 0)
-					{
+			if (i >= skip) {
+				if (text) {
+					if (text.localeCompare(selector[i].innerText) == 0) {
 						if (value)
 							selector[i].value = value;
 						else
@@ -70,7 +64,7 @@ function action(query, text, skip, repeat, timeout, value)
 					else
 						selector[i].click();
 				}
-				if(repeat == 0)
+				if (repeat == 0)
 					return;
 				repeat--;
 				break;
@@ -83,8 +77,7 @@ function action(query, text, skip, repeat, timeout, value)
 
 function actions(request)
 {
-	if(request.query)
-	{
+	if (request.query) {
 		var queries = request.query.split(' ');
 		var texts = request.text.split('|');
 		var skips = request.skip.split(' ');
@@ -98,31 +91,28 @@ function actions(request)
 
 // Check if the page has already loaded
 if (document.readyState === 'complete') {
-  chrome.runtime.sendMessage({ type: 'pageLoad', status: 'load' });
+	chrome.runtime.sendMessage({ type: 'pageLoad', status: 'load' });
 } else {
-  // Listen for DOM content loaded
-  document.addEventListener('DOMContentLoaded', () => {
-    chrome.runtime.sendMessage({ type: 'pageLoad', status: 'DOMContentLoaded' });
-  });
-
-  // Listen for full page load (including images/stylesheets)
-  window.addEventListener('load', () => {
-    chrome.runtime.sendMessage({ type: 'pageLoad', status: 'load' });
-  });
+	// Listen for DOM content loaded
+	document.addEventListener('DOMContentLoaded', () => {
+		chrome.runtime.sendMessage({ type: 'pageLoad', status: 'DOMContentLoaded' });
+	});
+	// Listen for full page load (including images/stylesheets)
+	window.addEventListener('load', () => {
+		chrome.runtime.sendMessage({ type: 'pageLoad', status: 'load' });
+	});
 }
 
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
-	if (request.pattern == 'E')
-	{
+	if (request.pattern == 'E') {
 		var script = document.createElement('script');
 		script.textContent = request.code;
 		(document.head||document.documentElement).appendChild(script);
 		script.remove();
 		return;
 	}
-	if(request.pipattern)
-	{
+	if (request.pipattern) {
 		var regex = new RegExp(request.pipattern, "i");
 		//console.log(document.body.innerHTML);
 		if (regex.test(document.body.innerHTML))
@@ -132,7 +122,7 @@ chrome.extension.onMessage.addListener(
 		}
 	}
 	var regex = new RegExp(request.checkme, "i");
-	if(request.pattern == 'A') {
+	if (request.pattern == 'A') {
 		if (regex.test(document.body.innerHTML)) {
 			actions(request);
 			sendResponse({findresult: "yes"});

@@ -341,6 +341,15 @@ function restoreOptions() {
 }
 
 function recvData(data){
+	if (pchange)
+		return;
+	if (data.preset != localStorage['preset']) {
+		localStorage['preset'] = data.preset;
+		getId('ppresets').value = data.preset;
+		preset = data.preset;
+		restoreOptions();
+		return;
+	}
 	if(data.status == 'start') {
 		getId("startbtn").value = "Stop";
 		getId("startbtn").classList.add("stop");
@@ -360,13 +369,6 @@ function recvData(data){
 			getId('contentid').value = data.checkme;
 		else if(data.pmpattern == 'B') 
 			getId('contentid1').value = data.checkme;
-	}
-	if (data.preset != localStorage['preset'] && !pchange)
-	{
-		localStorage['preset'] = data.preset;
-		getId('ppresets').value = data.preset;
-		preset = data.preset;
-		restoreOptions();
 	}
 
 	if(data.wait_time) {
